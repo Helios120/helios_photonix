@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Helios Photonic Quantum Lab — V3 Jumeau évolutif</title>
+  <style>
+    :root{
+      --bg:#02040a;--panel:rgba(7,12,25,.76);--panel2:rgba(255,255,255,.045);
+      --line:rgba(159,226,255,.18);--line2:rgba(255,226,138,.20);--text:#edf8ff;--muted:#9fb4c9;
+      --cyan:#66f4ff;--gold:#ffe28a;--violet:#b983ff;--green:#7dffbd;--pink:#ff74c2;--red:#ff688e;
+      --shadow:0 22px 70px rgba(0,0,0,.50);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+    body{
+      background:
+        radial-gradient(circle at 28% 45%,rgba(58,232,255,.14),transparent 35%),
+        radial-gradient(circle at 72% 48%,rgba(255,105,210,.13),transparent 35%),
+        radial-gradient(circle at 50% 55%,rgba(116,87,255,.13),transparent 46%),
+        linear-gradient(135deg,#02040b,#070b16 48%,#02040a);
+    }
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(circle at center,#000,transparent 82%)}
+    #app{position:relative;width:100vw;height:100vh;overflow:hidden}
+    canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+    .glass{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));backdrop-filter:blur(18px);box-shadow:var(--shadow);border-radius:24px}
+    .top{position:absolute;z-index:20;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
+    .hero{pointer-events:auto;max-width:680px;padding:16px 18px}
+    .kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;padding:7px 11px;border-radius:999px;border:1px solid rgba(102,244,255,.27);background:rgba(4,10,22,.72);color:var(--cyan);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+    .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 16px var(--green);animation:pulse 1.15s infinite}
+    @keyframes pulse{0%,100%{transform:scale(.8);opacity:.55}50%{transform:scale(1.3);opacity:1}}
+    h1{margin:0 0 8px;font-size:clamp(26px,4vw,54px);line-height:.95;letter-spacing:-.055em;text-shadow:0 0 28px rgba(102,244,255,.14)}
+    .hero p{margin:0;color:var(--muted);font-size:13px;line-height:1.52;max-width:630px}
+    .warn{margin-top:10px;padding:10px 12px;border-radius:16px;background:rgba(255,226,138,.08);border:1px solid var(--line2);color:#ffe9ad;font-size:12px;line-height:1.42}
+    .actions{pointer-events:auto;display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:560px}
+    button{border:1px solid rgba(154,224,255,.22);background:radial-gradient(circle at 50% 0,rgba(117,245,255,.16),transparent 58%),linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.025));color:#effbff;border-radius:16px;padding:10px 13px;cursor:pointer;font-weight:750;font-size:12px;letter-spacing:.02em;transition:.18s ease}
+    button:hover{transform:translateY(-1px);border-color:rgba(115,245,255,.58)}
+    button.active{border-color:rgba(255,226,138,.65);box-shadow:0 0 26px rgba(255,226,138,.13) inset;color:#fff2c6}
+    .panel{position:absolute;z-index:18;top:160px;bottom:14px;width:344px;padding:14px;overflow:auto;transition:.26s ease}
+    .panel.left{left:14px}.panel.right{right:14px}.panel.hidden.left{transform:translateX(-115%);opacity:0}.panel.hidden.right{transform:translateX(115%);opacity:0}
+    .panel::-webkit-scrollbar,.log::-webkit-scrollbar{width:6px}.panel::-webkit-scrollbar-thumb,.log::-webkit-scrollbar-thumb{background:rgba(151,225,255,.22);border-radius:999px}
+    .section{display:flex;justify-content:space-between;gap:10px;margin:2px 0 12px;font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#e3f6ff}.section span{font-size:10px;text-transform:none;letter-spacing:.04em;color:var(--muted)}
+    .block{margin-bottom:12px;padding:13px;border-radius:20px;background:var(--panel2);border:1px solid rgba(159,226,255,.12)}
+    .control{margin-bottom:12px}.control:last-child{margin-bottom:0}.control label{display:flex;justify-content:space-between;margin-bottom:8px;color:#f0fbff;font-size:12px}.control b{color:var(--gold);font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:#66f4ff}
+    textarea{width:100%;min-height:118px;resize:vertical;outline:none;border:1px solid rgba(154,224,255,.22);background:rgba(2,5,14,.68);border-radius:18px;color:#f3fbff;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.52}
+    textarea:focus{border-color:rgba(102,244,255,.62);box-shadow:0 0 0 3px rgba(102,244,255,.08)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{padding:12px;border-radius:18px;background:var(--panel2);border:1px solid rgba(159,226,255,.12);min-height:72px}.label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}.value{margin-top:6px;font-size:20px;font-weight:850;font-variant-numeric:tabular-nums;color:white}.sub{font-size:11px;color:var(--muted);margin-top:3px}
+    .decoder{min-height:92px;padding:12px;border-radius:18px;background:rgba(2,5,14,.58);border:1px solid rgba(159,226,255,.16);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;line-height:1.52;color:#cbfbff;word-break:break-word}
+    .log{display:flex;flex-direction:column;gap:8px;max-height:295px;overflow:auto;padding-right:4px}.entry{padding:10px 11px;border-radius:16px;background:rgba(255,255,255,.038);border:1px solid rgba(159,226,255,.12)}.entryHead{display:flex;justify-content:space-between;gap:10px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;font-weight:800;color:#f8fdff}.entryBody{margin-top:6px;color:var(--muted);font-size:12px;line-height:1.42}
+    .probe{position:absolute;z-index:22;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;pointer-events:none;color:#dffaff;white-space:nowrap}
+    .modelTag{position:absolute;z-index:12;transform:translate(-50%,-50%);padding:7px 10px;border-radius:999px;border:1px solid rgba(154,224,255,.18);background:rgba(4,8,18,.58);color:#dffaff;font-size:11px;letter-spacing:.08em;text-transform:uppercase;pointer-events:none;backdrop-filter:blur(10px)}
+    .mini{display:flex;flex-wrap:wrap;gap:6px}.chip{padding:7px 9px;border:1px solid rgba(159,226,255,.13);border-radius:999px;background:rgba(255,255,255,.035);font-size:11px;color:#dffaff}.chip.good{border-color:rgba(125,255,189,.25);color:#c9ffe0}.chip.warn{border-color:rgba(255,226,138,.25);color:#fff0bd}
+    #tagA,#tagB{display:none}.immersive .top,.immersive .panel,.immersive .probe{opacity:0;pointer-events:none}
+    @media(max-width:1080px){.panel{width:310px}.hero{max-width:540px}}
+    @media(max-width:860px){.panel.right{display:none}.panel{top:auto;left:10px!important;right:10px!important;bottom:10px;width:auto;max-height:44vh}.hero{max-width:none}.top{flex-direction:column}.actions{justify-content:flex-start}.probe{font-size:10px;max-width:94vw;overflow:hidden}}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <canvas id="lab"></canvas>
+    <div id="tagA" class="modelTag">Modèle A · émetteur</div>
+    <div id="tagB" class="modelTag">Modèle B · jumeau</div>
+
+    <div class="top">
+      <div class="hero glass">
+        <div class="kicker"><span class="pulse"></span> Helios Photonic Quantum Lab · V3</div>
+        <h1>Échange photonique jumeau 360°</h1>
+        <p>Deux modèles identiques échangent des photons simulés sans changer le principe : roue 360°, arcs chromatiques, message binaire, tunnel hertzien, mémoire circulaire, synchronisation et réponse du modèle jumeau.</p>
+        <div class="warn">Amélioration structurelle : correction d’erreurs, verrouillage de phase, persistance locale, équilibrage A/B et apprentissage de mémoire. Le système reste une simulation visuelle avancée, pas un dispositif quantique matériel.</div>
+      </div>
+      <div class="actions">
+        <button id="runBtn" class="active">Transmission ON</button>
+        <button id="exchangeBtn" class="active">Échange ON</button>
+        <button id="learnBtn" class="active">Mémoire évolutive ON</button>
+        <button id="fullscreenBtn">Plein écran</button>
+        <button id="togglePanelsBtn">Masquer panneaux</button>
+        <button id="immersiveBtn">Immersion</button>
+      </div>
+    </div>
+
+    <aside class="panel left glass" id="leftPanel">
+      <div class="section">Contrôle du noyau <span>base conservée</span></div>
+      <div class="block">
+        <div class="control"><label>Vitesse photons <b id="speedValue">1.25x</b></label><input id="speed" type="range" min="0.20" max="5" value="1.25" step="0.05"></div>
+        <div class="control"><label>Densité arcs <b id="densityValue">540</b></label><input id="density" type="range" min="100" max="1200" value="540" step="10"></div>
+        <div class="control"><label>Fréquence hertzienne <b id="carrierValue">8.88 Hz</b></label><input id="carrier" type="range" min="1" max="40" value="8.88" step="0.01"></div>
+        <div class="control"><label>Courbure spirale <b id="curveValue">0.72</b></label><input id="curve" type="range" min="0.08" max="1.60" value="0.72" step="0.01"></div>
+        <div class="control"><label>Mémoire photonique <b id="memoryValue">0.996</b></label><input id="memory" type="range" min="0.985" max="0.999" value="0.996" step="0.001"></div>
+        <div class="control"><label>Verrouillage de phase <b id="phaseLockValue">0.62</b></label><input id="phaseLock" type="range" min="0" max="1" value="0.62" step="0.01"></div>
+        <div class="control"><label>Intégrité / bruit <b id="integrityValue">94%</b></label><input id="integrity" type="range" min="70" max="100" value="94" step="1"></div>
+      </div>
+
+      <div class="block">
+        <div class="section">Message source <span>texte → bits → photons</span></div>
+        <textarea id="message">HELIOPHOTONIC 360 — Le modèle A transmet ses photons au modèle B. Le jumeau répond, synchronise les degrés, conserve la mémoire et renvoie l'information sous forme de quanta lumineux.</textarea>
+        <div class="grid2">
+          <button id="encodeBtn">Encoder</button>
+          <button id="injectBtn">Injecter local</button>
+          <button id="exchangeBurstBtn">Burst échange</button>
+          <button id="randomBtn">Signal test</button>
+          <button id="saveBtn">Sauver état</button>
+          <button id="loadBtn">Charger état</button>
+          <button id="resetBtn">Réinitialiser</button>
+          <button id="snapshotBtn">Exporter PNG</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="section">Modules actifs <span>sans changer les bases</span></div>
+        <div class="mini">
+          <span class="chip good">Correction d’erreurs</span>
+          <span class="chip good">Phase-lock A/B</span>
+          <span class="chip good">Mémoire persistante</span>
+          <span class="chip warn">Équilibrage photons</span>
+          <span class="chip">Traînées quantiques</span>
+          <span class="chip">Rosaces résonantes</span>
+        </div>
+      </div>
+    </aside>
+
+    <aside class="panel right glass" id="rightPanel">
+      <div class="section">Télémétrie <span>temps réel</span></div>
+      <div class="stats">
+        <div class="stat"><div class="label">Photons locaux</div><div class="value" id="localStat">0</div><div class="sub">roues A+B</div></div>
+        <div class="stat"><div class="label">Photons tunnel</div><div class="value" id="bridgeStat">0</div><div class="sub">A ↔ B</div></div>
+        <div class="stat"><div class="label">Phase A/B</div><div class="value" id="degreeStat">000°</div><div class="sub">synchronisation</div></div>
+        <div class="stat"><div class="label">Cohérence</div><div class="value" id="coherenceStat">0.00</div><div class="sub">accord du flux</div></div>
+        <div class="stat"><div class="label">Signal</div><div class="value" id="signalStat">0%</div><div class="sub">intégrité utile</div></div>
+        <div class="stat"><div class="label">Corrections</div><div class="value" id="correctedStat">0</div><div class="sub">erreurs récupérées</div></div>
+        <div class="stat"><div class="label">Mémoire A</div><div class="value" id="memoryAStat">0%</div><div class="sub">charge circulaire</div></div>
+        <div class="stat"><div class="label">Mémoire B</div><div class="value" id="memoryBStat">0%</div><div class="sub">charge circulaire</div></div>
+        <div class="stat"><div class="label">Checksum</div><div class="value" id="checksumStat">00</div><div class="sub">contrôle binaire</div></div>
+        <div class="stat"><div class="label">Octets</div><div class="value" id="bytesStat">0</div><div class="sub">message</div></div>
+      </div>
+      <div class="block" style="margin-top:12px">
+        <div class="section">Décodeur <span>signal reçu</span></div>
+        <div id="decoder" class="decoder">En attente d’encodage…</div>
+      </div>
+      <div class="block">
+        <div class="section">Journal intelligent <span>diagnostic</span></div>
+        <div id="log" class="log"></div>
+      </div>
+    </aside>
+
+    <div class="probe glass"><span class="pulse"></span><span id="probe">A↔B 00000000 · tunnel 0 photons · cohérence 0.00</span></div>
+  </div>
+
+  <script>
+    (()=>{
+      'use strict';
+      const canvas=document.getElementById('lab');
+      const ctx=canvas.getContext('2d',{alpha:true});
+      const dpr=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+      const $=id=>document.getElementById(id);
+      const ui={
+        app:$('app'),tagA:$('tagA'),tagB:$('tagB'),runBtn:$('runBtn'),exchangeBtn:$('exchangeBtn'),learnBtn:$('learnBtn'),fullscreenBtn:$('fullscreenBtn'),togglePanelsBtn:$('togglePanelsBtn'),immersiveBtn:$('immersiveBtn'),
+        leftPanel:$('leftPanel'),rightPanel:$('rightPanel'),speed:$('speed'),density:$('density'),carrier:$('carrier'),curve:$('curve'),memory:$('memory'),phaseLock:$('phaseLock'),integrity:$('integrity'),
+        speedValue:$('speedValue'),densityValue:$('densityValue'),carrierValue:$('carrierValue'),curveValue:$('curveValue'),memoryValue:$('memoryValue'),phaseLockValue:$('phaseLockValue'),integrityValue:$('integrityValue'),
+        message:$('message'),encodeBtn:$('encodeBtn'),injectBtn:$('injectBtn'),exchangeBurstBtn:$('exchangeBurstBtn'),randomBtn:$('randomBtn'),saveBtn:$('saveBtn'),loadBtn:$('loadBtn'),resetBtn:$('resetBtn'),snapshotBtn:$('snapshotBtn'),
+        localStat:$('localStat'),bridgeStat:$('bridgeStat'),degreeStat:$('degreeStat'),coherenceStat:$('coherenceStat'),signalStat:$('signalStat'),correctedStat:$('correctedStat'),memoryAStat:$('memoryAStat'),memoryBStat:$('memoryBStat'),checksumStat:$('checksumStat'),bytesStat:$('bytesStat'),decoder:$('decoder'),log:$('log'),probe:$('probe')
+      };
+      const state={w:0,h:0,t:0,last:performance.now(),running:true,exchangeOn:true,learning:true,panelsHidden:false,immersive:false,bits:[],bytes:[],checksum:0,injectIndex:0,packetsA:[],packetsB:[],bridge:[],memoryA:new Array(360).fill(0),memoryB:new Array(360).fill(0),stars:[],nodes:[],modelA:{x:0,y:0,r:0},modelB:{x:0,y:0,r:0},phaseDegree:0,phaseA:0,phaseB:Math.PI,coherence:0,signal:1,corrected:0,lost:0,learnBiasA:new Array(360).fill(0),learnBiasB:new Array(360).fill(0)};
+      const zodiac=['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+      const logs=['Le photon A→B transporte un bit, une phase, une parité et un degré cible.','Le jumeau répond avec phase inversée pour maintenir le dialogue sans casser la symétrie.','La mémoire circulaire ne repart pas de zéro : elle apprend les zones les plus sollicitées.','Le verrouillage de phase corrige progressivement le décalage A/B.','La correction d’erreurs restaure les bits perturbés par le bruit simulé.','L’équilibrage limite la saturation : sinon le tunnel devient une autoroute aux heures de pointe.','Chaque degré reste une adresse d’information dans le cercle 360°.'];
+      const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+      const avg=a=>a.reduce((s,v)=>s+v,0)/a.length;
+      function addLog(head,body){const e=document.createElement('div');e.className='entry';const tm=new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});e.innerHTML=`<div class="entryHead"><span>${head}</span><span>${tm}</span></div><div class="entryBody">${body}</div>`;ui.log.prepend(e);while(ui.log.children.length>26)ui.log.removeChild(ui.log.lastChild)}
+      function resize(){state.w=innerWidth;state.h=innerHeight;canvas.width=Math.floor(state.w*dpr);canvas.height=Math.floor(state.h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);const dual=state.w>760;const r=dual?Math.min(state.w*.205,state.h*.34):Math.min(state.w,state.h)*.34;state.modelA={x:dual?state.w*.33:state.w*.5,y:state.h*.56,r};state.modelB={x:dual?state.w*.67:state.w*.5,y:dual?state.h*.56:state.h*1.13,r};ui.tagA.style.left=state.modelA.x+'px';ui.tagA.style.top=(state.modelA.y-state.modelA.r*1.24)+'px';ui.tagB.style.left=state.modelB.x+'px';ui.tagB.style.top=(state.modelB.y-state.modelB.r*1.24)+'px';ui.tagA.style.display=ui.tagB.style.display='block';initStars();initNodes()}
+      function initStars(){state.stars=Array.from({length:320},()=>({x:Math.random()*state.w,y:Math.random()*state.h,r:Math.random()*1.5+.2,a:Math.random()*.7+.08,tw:Math.random()*5+1}))}
+      function initNodes(){state.nodes=[];[.20,.36,.52,.68,.84,1.02].forEach((rr,ri)=>{const n=8+ri*6;for(let i=0;i<n;i++)state.nodes.push({a:i/n*Math.PI*2+(ri%2?Math.PI/n:0),r:rr,p:Math.random()*Math.PI*2,l:ri})})}
+      const ang=d=>-Math.PI/2+d*Math.PI/180, hue=d=>(d+18)%360, pt=(m,d,r)=>({x:m.x+Math.cos(ang(d))*r,y:m.y+Math.sin(ang(d))*r});
+      const byteBits=n=>n.toString(2).padStart(8,'0').split('').map(Number);
+      const parityOf=n=>byteBits(n&255).reduce((a,b)=>a^b,0);
+      function encode(){const data=Array.from(new TextEncoder().encode(ui.message.value||'HELIOPHOTONIC'));state.bytes=data;state.bits=data.flatMap(byteBits);state.checksum=data.reduce((a,n)=>(a^n)&255,0);state.injectIndex=0;state.packetsA.length=0;state.packetsB.length=0;state.bridge.length=0;ui.decoder.textContent=new TextDecoder().decode(new Uint8Array(data));injectLocal(72);spawnBridge(84,'AB');spawnBridge(84,'BA');addLog('Encodage',`${data.length} octets convertis en ${state.bits.length} bits. Parité et checksum activés.`);saveSoftState()}
+      function makePacket(i,side){const bit=state.bits[i%Math.max(1,state.bits.length)]||0;const byte=state.bytes[Math.floor(i/8)%Math.max(1,state.bytes.length)]||0;const deg=(i*137.507764+(side==='B'?90:0))%360;return{bit,index:i,degree:deg,r:.04+Math.random()*.12,life:0,ttl:8+Math.random()*10,phase:Math.random()*Math.PI*2,speed:.25+Math.random()*.8+bit*.35,spin:Math.random()>.5?1:-1,amp:.7+Math.random()*.8,parity:parityOf(byte),trail:[]}}
+      function injectLocal(n=48){if(!state.bits.length){encode();return}for(let k=0;k<n;k++){const i=(state.injectIndex++)%state.bits.length;state.packetsA.push(makePacket(i,'A'));state.packetsB.push(makePacket(i,'B'))}trimPackets();addLog('Injection locale',`${n} paquets locaux créés dans chaque modèle. Charge équilibrée.`)}
+      function spawnBridge(n=36,dir='AB'){if(!state.bits.length)return;const maxBridge=900;for(let k=0;k<n;k++){const i=(state.injectIndex+k)%state.bits.length;const bit=state.bits[i]||0;const byte=state.bytes[Math.floor(i/8)%Math.max(1,state.bytes.length)]||0;state.bridge.push({dir,bit,index:i,degree:(i*137.507764+k*19)%360,u:Math.random()*.16,life:0,speed:.16+Math.random()*.34+bit*.16,phase:Math.random()*Math.PI*2,amp:.7+Math.random()*.9,parity:parityOf(byte),noise:0,corrected:false})}if(state.bridge.length>maxBridge)state.bridge.splice(0,state.bridge.length-maxBridge);addLog('Échange photonique',`${n} photons ${dir==='AB'?'A → B':'B → A'} envoyés avec contrôle de parité.`)}
+      function trimPackets(){const max=520;if(state.packetsA.length>max)state.packetsA.splice(0,state.packetsA.length-max);if(state.packetsB.length>max)state.packetsB.splice(0,state.packetsB.length-max)}
+      function background(t){ctx.clearRect(0,0,state.w,state.h);const g=ctx.createRadialGradient(state.w*.5,state.h*.55,10,state.w*.5,state.h*.55,Math.max(state.w,state.h)*.7);g.addColorStop(0,'rgba(255,255,255,.08)');g.addColorStop(.25,'rgba(80,230,255,.055)');g.addColorStop(.62,'rgba(110,70,255,.065)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,state.w,state.h);for(const s of state.stars){const a=s.a*(.45+.55*Math.sin(t*s.tw+s.x*.01)**2);ctx.beginPath();ctx.fillStyle=`rgba(215,240,255,${a})`;ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}}
+      function wheel(m){const R=m.r,outer=R*1.18,inner=R*1.015;ctx.save();ctx.translate(m.x,m.y);for(let i=0;i<12;i++){const a1=-Math.PI/2+i*Math.PI/6,a2=a1+Math.PI/6;ctx.beginPath();ctx.arc(0,0,outer,a1,a2);ctx.arc(0,0,inner,a2,a1,true);ctx.closePath();ctx.fillStyle=i%2?'rgba(255,255,255,.022)':'rgba(105,230,255,.032)';ctx.fill();ctx.strokeStyle='rgba(220,245,255,.25)';ctx.lineWidth=1;ctx.stroke();ctx.save();ctx.rotate(a1+Math.PI/12);ctx.translate(R*1.11,0);ctx.rotate(Math.PI/2);ctx.fillStyle='rgba(248,252,255,.88)';ctx.font=`${Math.max(20,R*.07)}px Georgia,serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(zodiac[i],0,0);ctx.restore()}ctx.beginPath();ctx.arc(0,0,outer,0,Math.PI*2);ctx.arc(0,0,inner,0,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,.68)';ctx.lineWidth=2.2;ctx.stroke();for(let d=0;d<360;d++){const a=ang(d),maj=d%10===0,mid=d%5===0,from=maj?R*.952:mid?R*.965:R*.976;ctx.beginPath();ctx.moveTo(Math.cos(a)*from,Math.sin(a)*from);ctx.lineTo(Math.cos(a)*R*.99,Math.sin(a)*R*.99);ctx.strokeStyle=maj?'rgba(255,255,255,.78)':'rgba(190,225,255,.38)';ctx.lineWidth=maj?1.3:.6;ctx.stroke();if(maj){ctx.save();ctx.rotate(a);ctx.translate(R*.925,0);ctx.rotate(Math.PI/2);ctx.fillStyle='rgba(230,242,255,.68)';ctx.font=`700 ${Math.max(9,R*.032)}px Inter,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(d),0,0);ctx.restore()}}ctx.restore()}
+      function halo(m,t,mem,label){const R=m.r,charge=avg(mem),phase=label==='A'?state.phaseA:state.phaseB;ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<3;k++){ctx.beginPath();ctx.arc(m.x,m.y,R*(1.21+k*.035+.008*Math.sin(t*2+k+phase)),0,Math.PI*2);ctx.strokeStyle=`hsla(${label==='A'?190+k*18:300+k*22},100%,70%,${.08+charge*.12})`;ctx.lineWidth=1.1+k*.55;ctx.stroke()}ctx.restore()}
+      function arcs(m,t){const R=m.r,rings=Math.floor(Number(ui.density.value)/10),curve=Number(ui.curve.value),carrier=Number(ui.carrier.value);ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';for(let i=0;i<rings;i++){const n=i/Math.max(1,rings-1),rr=R*(.055+n*.84),start=(t*16*curve+i*2.618)%360,sweep=205+120*Math.sin(t*.23+i*.09)**2,h=hue(i*360/rings+t*18);ctx.beginPath();ctx.arc(m.x,m.y,rr,ang(start),ang(start+sweep));ctx.strokeStyle=`hsla(${h},100%,${56+n*18}%,${.14+n*.38})`;ctx.lineWidth=Math.max(.6,R*.002);ctx.stroke();if(i%3===0){ctx.beginPath();const wr=rr+Math.sin(t*carrier+i*.35)*R*.004;ctx.arc(m.x,m.y,wr,ang(start+1),ang(start+sweep-1));ctx.strokeStyle=`hsla(${(h+60)%360},100%,70%,.08)`;ctx.lineWidth=Math.max(.4,R*.0015);ctx.stroke()}}ctx.restore()}
+      function spiral(m,t){const R=m.r,curve=Number(ui.curve.value);ctx.save();ctx.globalCompositeOperation='lighter';for(let arm=0;arm<12;arm++){ctx.beginPath();for(let i=0;i<=360;i++){const n=i/360,d=i*2.4*curve+arm*30+t*10,rr=R*(.035+n*.82),p=pt(m,d,rr);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y)}ctx.strokeStyle=`hsla(${(arm*30+t*12)%360},100%,66%,.062)`;ctx.lineWidth=.85;ctx.stroke()}ctx.restore()}
+      function rosette(m,t){const R=m.r;drawRose(m.x,m.y,R*.52,12,t*.08,.18,195+t*8);drawRose(m.x,m.y,R*.24,8,-t*.16,.18,300+t*12);for(let k=0;k<6;k++){const p=pt(m,k*60+t*8,R*(.48+.08*Math.sin(t+k)));drawRose(p.x,p.y,R*.07,6+(k%3)*2,t*.12,.08,120+k*41)}}
+      function drawRose(x,y,r,lobes,rot,alpha,h0){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.globalCompositeOperation='lighter';for(let l=0;l<lobes;l++){ctx.save();ctx.rotate(l/lobes*Math.PI*2);ctx.beginPath();for(let i=0;i<=100;i++){const p=i/100,a=p*Math.PI*2,rr=r*(.18+.82*Math.sin(a*2)**2)*(.62+.38*p),xx=Math.cos(a)*rr+Math.cos(l)*r*.12,yy=Math.sin(a)*rr*.42;if(i===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy)}ctx.strokeStyle=`hsla(${(h0+l*17)%360},100%,70%,${alpha})`;ctx.lineWidth=Math.max(.4,r*.006);ctx.stroke();ctx.restore()}ctx.restore()}
+      function nodes(m,t){const R=m.r;ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<state.nodes.length;i++){const n=state.nodes[i],rr=R*n.r*(.98+.025*Math.sin(t*.8+n.p)),a=n.a+.04*Math.sin(t*.18+n.l),x=m.x+Math.cos(a)*rr,y=m.y+Math.sin(a)*rr,g=.45+.55*Math.sin(t*1.8+n.p)**2;ctx.beginPath();ctx.fillStyle=`hsla(${175+n.l*29},100%,72%,${.13+g*.30})`;ctx.arc(x,y,R*(.004+n.l*.0008)*(1+g*.8),0,Math.PI*2);ctx.fill();if(i%4===0){const q=state.nodes[(i+7)%state.nodes.length],qx=m.x+Math.cos(q.a)*R*q.r,qy=m.y+Math.sin(q.a)*R*q.r;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(m.x,m.y,qx,qy);ctx.strokeStyle=`rgba(135,235,255,${.028+g*.04})`;ctx.lineWidth=.75;ctx.stroke()}}ctx.restore()}
+      function memory(m,mem,bias){const R=m.r,decay=Number(ui.memory.value);ctx.save();ctx.globalCompositeOperation='lighter';for(let d=0;d<360;d++){const v=mem[d]+(state.learning?bias[d]*.22:0);if(v>.01){const a=ang(d),r1=R*.90,r2=R*(.92+clamp(v,0,1)*.09);ctx.beginPath();ctx.moveTo(m.x+Math.cos(a)*r1,m.y+Math.sin(a)*r1);ctx.lineTo(m.x+Math.cos(a)*r2,m.y+Math.sin(a)*r2);ctx.strokeStyle=`hsla(${hue(d)},100%,65%,${clamp(v,0,1)*.44})`;ctx.lineWidth=1+clamp(v,0,1)*2.3;ctx.stroke()}mem[d]*=decay;if(state.learning)bias[d]*=.9991}ctx.restore()}
+      function localPackets(list,m,mem,bias,dt,t,label){const R=m.r,speed=Number(ui.speed.value),carrier=Number(ui.carrier.value),curve=Number(ui.curve.value);let focus=0,energy=0;ctx.save();ctx.globalCompositeOperation='lighter';for(let i=list.length-1;i>=0;i--){const p=list[i];p.life+=dt*speed*(.55+p.speed);p.degree=(p.degree+dt*speed*(12+p.speed*34)*p.spin+360)%360;p.r=Math.min(.94,p.r+dt*speed*.038*(.7+p.bit*.4));if(p.life>p.ttl){list.splice(i,1);continue}const mod=Math.sin(t*carrier+p.phase+p.index*.07),d=p.degree+mod*7*curve,rr=R*(.06+p.r*.86)+mod*R*.012,pos=pt(m,d,rr),h=p.bit?48+mod*12:190+mod*30,sz=R*(p.bit?.0085:.006)*(1+.6*Math.abs(mod));p.trail.push({x:pos.x,y:pos.y,h});if(p.trail.length>9)p.trail.shift();const di=Math.round(p.degree)%360;mem[di]=Math.min(1,mem[di]+.014+p.bit*.018);if(state.learning)bias[di]=Math.min(1,bias[di]+.002+p.bit*.002);for(let j=0;j<p.trail.length;j++){const tr=p.trail[j],a=(j+1)/p.trail.length;ctx.beginPath();ctx.fillStyle=`hsla(${tr.h},100%,70%,${.018+a*.04})`;ctx.arc(tr.x,tr.y,sz*(.6+a*1.15),0,Math.PI*2);ctx.fill()}const glow=ctx.createRadialGradient(pos.x,pos.y,0,pos.x,pos.y,sz*7);glow.addColorStop(0,`hsla(${h},100%,78%,${.75*p.amp})`);glow.addColorStop(.35,`hsla(${h},100%,62%,${.25*p.amp})`);glow.addColorStop(1,`hsla(${h},100%,50%,0)`);ctx.beginPath();ctx.fillStyle=glow;ctx.arc(pos.x,pos.y,sz*7,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.fillStyle=`hsla(${h},100%,84%,.88)`;ctx.arc(pos.x,pos.y,sz,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.moveTo(m.x,m.y);const c=pt(m,(d+90)%360,rr*.45+R*.05);ctx.quadraticCurveTo(c.x,c.y,pos.x,pos.y);ctx.strokeStyle=`hsla(${h},100%,70%,${p.bit?.18:.11})`;ctx.lineWidth=p.bit?1.1:.75;ctx.stroke();focus+=p.degree;energy+=Math.abs(mod)*(p.bit?1.2:.8)}ctx.restore();if(label==='A'){state.phaseDegree=list.length?(focus/list.length)%360:(state.phaseDegree+dt*8)%360;state.coherence=list.length?Math.min(.99,energy/list.length):Math.max(0,state.coherence*.985)}}
+      function core(m,t,label){const R=m.r,c=R*.055,phase=label==='A'?state.phaseA:state.phaseB;ctx.save();ctx.globalCompositeOperation='lighter';for(let i=0;i<8;i++){ctx.beginPath();ctx.arc(m.x,m.y,c*(1+i*.62+.2*Math.sin(t*2+i+phase)),0,Math.PI*2);ctx.strokeStyle=`hsla(${i*42+t*50+(label==='B'?60:0)},100%,65%,${.18-i*.015})`;ctx.lineWidth=1.15;ctx.stroke()}const g=ctx.createRadialGradient(m.x,m.y,0,m.x,m.y,c*6);g.addColorStop(0,'rgba(255,255,255,.94)');g.addColorStop(.12,'rgba(255,235,120,.66)');g.addColorStop(.35,'rgba(100,250,255,.32)');g.addColorStop(1,'rgba(115,80,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(m.x,m.y,c*6,0,Math.PI*2);ctx.fill();ctx.restore()}
+      function model(m,list,mem,bias,t,dt,label){halo(m,t,mem,label);rosette(m,t);spiral(m,t);arcs(m,t);memory(m,mem,bias);nodes(m,t);localPackets(list,m,mem,bias,dt,t,label);core(m,t,label);wheel(m)}
+      function cubic(a,b,c,d,t){const mt=1-t;return mt*mt*mt*a+3*mt*mt*t*b+3*mt*t*t*c+t*t*t*d}
+      function bridge(dt,t){const A=state.modelA,B=state.modelB,dist=Math.hypot(B.x-A.x,B.y-A.y);if(dist<20)return;const phaseLock=Number(ui.phaseLock.value);state.phaseA+=((state.phaseDegree*Math.PI/180)-state.phaseA)*dt*phaseLock*.8;state.phaseB+=((state.phaseA+Math.PI)-state.phaseB)*dt*phaseLock*.8;ctx.save();ctx.globalCompositeOperation='lighter';for(let k=-5;k<=5;k++){const off=k*Math.min(A.r,B.r)*.047;ctx.beginPath();ctx.moveTo(A.x,A.y+off);ctx.bezierCurveTo(A.x+dist*.25,A.y-A.r*.58+off*.2,B.x-dist*.25,B.y+B.r*.58-off*.2,B.x,B.y-off);ctx.strokeStyle=`rgba(${120+k*7},${225-Math.abs(k)*15},255,${.055+.085*Math.sin(t*2+k)**2})`;ctx.lineWidth=.65+(5-Math.abs(k))*.18;ctx.stroke()}let energy=0,clean=0,total=Math.max(1,state.bridge.length);for(let i=state.bridge.length-1;i>=0;i--){const p=state.bridge[i];p.u+=dt*Number(ui.speed.value)*p.speed;p.life+=dt;const integrity=Number(ui.integrity.value)/100;const noisy=Math.random()>(integrity+(p.bit?.015:0));if(noisy&&!p.corrected){p.noise++;if(Math.random()<integrity*.85){p.corrected=true;state.corrected++}else if(p.noise>2){state.lost++;state.bridge.splice(i,1);continue}}
+        if(p.u>=1){const mem=p.dir==='AB'?state.memoryB:state.memoryA,bias=p.dir==='AB'?state.learnBiasB:state.learnBiasA,arr=p.dir==='AB'?state.packetsB:state.packetsA;const di=Math.round(p.degree)%360;mem[di]=Math.min(1,mem[di]+.35+p.bit*.25);if(state.learning)bias[di]=Math.min(1,bias[di]+.025+p.bit*.035);if(arr.length<520)arr.push(makePacket(p.index,p.dir==='AB'?'B':'A'));state.bridge.splice(i,1);continue}
+        const from=p.dir==='AB'?A:B,to=p.dir==='AB'?B:A,u=p.u,wave=Math.sin(u*Math.PI*2+p.phase+t*Number(ui.carrier.value)+(p.dir==='AB'?state.phaseA:state.phaseB)),c1x=from.x+(to.x-from.x)*.26,c1y=from.y-from.r*.72+wave*from.r*.12,c2x=from.x+(to.x-from.x)*.74,c2y=to.y+to.r*.72-wave*to.r*.12,x=cubic(from.x,c1x,c2x,to.x,u),y=cubic(from.y,c1y,c2y,to.y,u),h=(p.bit?48:190)+p.degree*.22+t*25+(p.corrected?95:0),sz=Math.max(3,A.r*.010)*(p.bit?1.35:1)*p.amp*(p.noise?1.18:1);const g=ctx.createRadialGradient(x,y,0,x,y,sz*8);g.addColorStop(0,`hsla(${h},100%,84%,${p.noise?.72:.92})`);g.addColorStop(.34,`hsla(${h},100%,62%,.30)`);g.addColorStop(1,`hsla(${h},100%,50%,0)`);ctx.beginPath();ctx.fillStyle=g;ctx.arc(x,y,sz*8,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.fillStyle=`hsla(${h},100%,88%,.96)`;ctx.arc(x,y,sz,0,Math.PI*2);ctx.fill();if(p.corrected){ctx.beginPath();ctx.strokeStyle='rgba(125,255,189,.48)';ctx.arc(x,y,sz*2.1,0,Math.PI*2);ctx.stroke()}energy+=Math.abs(wave)*(p.bit?1.25:.8);if(!p.noise||p.corrected)clean++}ctx.restore();state.signal=clean/total;state.coherence=Math.min(.99,(state.coherence*.92)+(energy/Math.max(1,total))*.08)}
+      function memoryCharge(mem){return Math.round(avg(mem)*100)}
+      function updateUI(){ui.speedValue.textContent=Number(ui.speed.value).toFixed(2)+'x';ui.densityValue.textContent=ui.density.value;ui.carrierValue.textContent=Number(ui.carrier.value).toFixed(2)+' Hz';ui.curveValue.textContent=Number(ui.curve.value).toFixed(2);ui.memoryValue.textContent=Number(ui.memory.value).toFixed(3);ui.phaseLockValue.textContent=Number(ui.phaseLock.value).toFixed(2);ui.integrityValue.textContent=ui.integrity.value+'%';ui.localStat.textContent=String(state.packetsA.length+state.packetsB.length);ui.bridgeStat.textContent=String(state.bridge.length);ui.degreeStat.textContent=String(Math.round(state.phaseDegree)).padStart(3,'0')+'°';ui.coherenceStat.textContent=state.coherence.toFixed(2);ui.signalStat.textContent=Math.round(state.signal*100)+'%';ui.correctedStat.textContent=String(state.corrected);ui.memoryAStat.textContent=memoryCharge(state.memoryA)+'%';ui.memoryBStat.textContent=memoryCharge(state.memoryB)+'%';ui.checksumStat.textContent=state.checksum.toString(16).padStart(2,'0').toUpperCase();ui.bytesStat.textContent=String(state.bytes.length);const p=state.bridge[0];const bits=p?state.bits.slice(p.index,p.index+8).join('').padEnd(8,'0'):'00000000';ui.probe.textContent=`A↔B ${bits} · tunnel ${state.bridge.length} photons · signal ${Math.round(state.signal*100)}% · corrections ${state.corrected}`}
+      function autoBalance(){if(state.packetsA.length>state.packetsB.length+80)state.packetsA.splice(0,40);if(state.packetsB.length>state.packetsA.length+80)state.packetsB.splice(0,40);if(state.bridge.length<80&&state.exchangeOn){spawnBridge(24,'AB');spawnBridge(24,'BA')}}
+      function loop(now){const dt=Math.min(.05,(now-state.last)/1000);state.last=now;if(state.running)state.t+=dt;const t=state.t;background(t);model(state.modelA,state.packetsA,state.memoryA,state.learnBiasA,t+state.phaseA,state.running?dt:0,'A');model(state.modelB,state.packetsB,state.memoryB,state.learnBiasB,t+Math.PI+state.phaseB,state.running?dt:0,'B');bridge(state.running?dt:0,t);updateUI();if(state.running&&state.exchangeOn&&Math.random()<.043)spawnBridge(7,Math.random()>.5?'AB':'BA');if(state.running&&(state.packetsA.length+state.packetsB.length)<300&&Math.random()<.028)injectLocal(6);if(state.running&&Math.floor(t*10)%60===0)autoBalance();if(state.running&&Math.floor(t*10)%41===0&&loop.lastLog!==Math.floor(t*10)){loop.lastLog=Math.floor(t*10);addLog('Analyse',logs[Math.floor(Math.random()*logs.length)])}requestAnimationFrame(loop)}
+      function reset(){state.packetsA.length=0;state.packetsB.length=0;state.bridge.length=0;state.memoryA.fill(0);state.memoryB.fill(0);state.learnBiasA.fill(0);state.learnBiasB.fill(0);state.t=0;state.coherence=0;state.phaseDegree=0;state.signal=1;state.corrected=0;state.lost=0;addLog('Reset','Les deux modèles, le tunnel et la mémoire évolutive ont été réinitialisés.')}
+      function randomSignal(){const words=['HELIO','PHOTON','SPIRALE','ROSE','BINAIRE','HERTZ','QUANTA','MEMOIRE','DEGRE','ARC','LUMIERE','JUMEAU','ECHANGE','SYNCHRONISATION','PARITE','PHASE','COHERENCE','INTEGRITE'];let s='';for(let i=0;i<28;i++)s+=words[Math.floor(Math.random()*words.length)]+(i%7===6?' — ':' ');ui.message.value=s.trim();encode()}
+      function snapshot(){const a=document.createElement('a');a.download=`helios-photonic-jumeau-v3-${Date.now()}.png`;a.href=canvas.toDataURL('image/png');a.click()}
+      function saveState(){const payload={message:ui.message.value,controls:{speed:ui.speed.value,density:ui.density.value,carrier:ui.carrier.value,curve:ui.curve.value,memory:ui.memory.value,phaseLock:ui.phaseLock.value,integrity:ui.integrity.value},memoryA:state.memoryA,memoryB:state.memoryB,biasA:state.learnBiasA,biasB:state.learnBiasB,corrected:state.corrected,checksum:state.checksum};localStorage.setItem('heliosPhotonicTwinV3',JSON.stringify(payload));addLog('Sauvegarde','État local sauvegardé : message, réglages, mémoire A/B et apprentissage.')}
+      function saveSoftState(){try{localStorage.setItem('heliosPhotonicTwinV3Message',ui.message.value)}catch(e){}}
+      function loadState(){try{const raw=localStorage.getItem('heliosPhotonicTwinV3');if(!raw){addLog('Chargement','Aucun état sauvegardé trouvé.');return}const p=JSON.parse(raw);ui.message.value=p.message||ui.message.value;if(p.controls){for(const [k,v] of Object.entries(p.controls)){if(ui[k])ui[k].value=v}}if(Array.isArray(p.memoryA)&&p.memoryA.length===360)state.memoryA=p.memoryA.map(Number);if(Array.isArray(p.memoryB)&&p.memoryB.length===360)state.memoryB=p.memoryB.map(Number);if(Array.isArray(p.biasA)&&p.biasA.length===360)state.learnBiasA=p.biasA.map(Number);if(Array.isArray(p.biasB)&&p.biasB.length===360)state.learnBiasB=p.biasB.map(Number);state.corrected=Number(p.corrected||0);encode();addLog('Chargement','État local chargé puis réinjecté dans les deux modèles.')}catch(e){addLog('Erreur','Impossible de charger l’état sauvegardé. Données locales corrompues ou absentes.')}}
+      async function fullscreen(){try{if(!document.fullscreenElement){await document.documentElement.requestFullscreen();ui.fullscreenBtn.textContent='Quitter plein écran'}else{await document.exitFullscreen();ui.fullscreenBtn.textContent='Plein écran'}}catch(e){addLog('Plein écran','Le navigateur a refusé. Clique à nouveau sur le bouton.')}}
+      ui.runBtn.onclick=()=>{state.running=!state.running;ui.runBtn.classList.toggle('active',state.running);ui.runBtn.textContent=state.running?'Transmission ON':'Transmission OFF'};
+      ui.exchangeBtn.onclick=()=>{state.exchangeOn=!state.exchangeOn;ui.exchangeBtn.classList.toggle('active',state.exchangeOn);ui.exchangeBtn.textContent=state.exchangeOn?'Échange ON':'Échange OFF'};
+      ui.learnBtn.onclick=()=>{state.learning=!state.learning;ui.learnBtn.classList.toggle('active',state.learning);ui.learnBtn.textContent=state.learning?'Mémoire évolutive ON':'Mémoire évolutive OFF'};
+      ui.fullscreenBtn.onclick=fullscreen;ui.togglePanelsBtn.onclick=()=>{state.panelsHidden=!state.panelsHidden;ui.leftPanel.classList.toggle('hidden',state.panelsHidden);ui.rightPanel.classList.toggle('hidden',state.panelsHidden);ui.togglePanelsBtn.textContent=state.panelsHidden?'Afficher panneaux':'Masquer panneaux'};
+      ui.immersiveBtn.onclick=()=>{state.immersive=!state.immersive;ui.app.classList.toggle('immersive',state.immersive)};ui.encodeBtn.onclick=encode;ui.injectBtn.onclick=()=>injectLocal(96);ui.exchangeBurstBtn.onclick=()=>{spawnBridge(150,'AB');spawnBridge(150,'BA')};ui.randomBtn.onclick=randomSignal;ui.saveBtn.onclick=saveState;ui.loadBtn.onclick=loadState;ui.resetBtn.onclick=reset;ui.snapshotBtn.onclick=snapshot;
+      [ui.speed,ui.density,ui.carrier,ui.curve,ui.memory,ui.phaseLock,ui.integrity].forEach(el=>el.addEventListener('input',()=>{updateUI();saveSoftState()}));
+      document.addEventListener('keydown',e=>{if(e.target&&['TEXTAREA','INPUT'].includes(e.target.tagName))return;if(e.key.toLowerCase()==='f')fullscreen();if(e.code==='Space'){e.preventDefault();ui.runBtn.click()}if(e.key.toLowerCase()==='e')ui.exchangeBurstBtn.click();if(e.key.toLowerCase()==='h')ui.immersiveBtn.click();if(e.key.toLowerCase()==='s')saveState();if(e.key.toLowerCase()==='l')loadState()});
+      addEventListener('resize',resize);document.addEventListener('fullscreenchange',resize);
+      resize();const savedMsg=localStorage.getItem('heliosPhotonicTwinV3Message');if(savedMsg)ui.message.value=savedMsg;encode();addLog('Initialisation','V3 chargée : base conservée, synchronisation renforcée, correction d’erreurs et mémoire évolutive actives.');requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
