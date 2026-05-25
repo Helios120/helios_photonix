@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://helios120.github.io/helios-photonix/sitemap.xml
