@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Helios Photonic Intelligent — Cerveau Chromoluminique</title>
+  <style>
+    :root {
+      --bg: #02050d;
+      --panel: rgba(4, 10, 23, 0.78);
+      --panel2: rgba(255, 255, 255, 0.045);
+      --line: rgba(91, 206, 255, 0.24);
+      --line2: rgba(255, 220, 130, 0.22);
+      --text: #eaf8ff;
+      --muted: #91aabd;
+      --cyan: #5cf5ff;
+      --blue: #2d8cff;
+      --gold: #ffe178;
+      --violet: #b477ff;
+      --pink: #ff5ac8;
+      --green: #74ffb7;
+      --red: #ff5c8a;
+      --shadow: 0 20px 80px rgba(0, 0, 0, 0.58);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 52%, rgba(50, 115, 255, .22), transparent 35%),
+        radial-gradient(circle at 22% 28%, rgba(92, 245, 255, .13), transparent 30%),
+        radial-gradient(circle at 78% 64%, rgba(255, 90, 200, .12), transparent 30%),
+        linear-gradient(135deg, #01030a, #06101f 48%, #010208);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at center, black, transparent 80%);
+      opacity: .75;
+    }
+
+    #app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    canvas#brainCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .glass {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.064), rgba(255,255,255,.022));
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      border-radius: 22px;
+      overflow: hidden;
+    }
+
+    .topbar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      height: 66px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: 360px 1fr 410px;
+      gap: 10px;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .brand, .top-center, .top-actions {
+      height: 66px;
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+    }
+
+    .brand {
+      padding: 10px 14px;
+      gap: 13px;
+    }
+
+    .sun-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      position: relative;
+      background:
+        radial-gradient(circle, #fff 0 7%, var(--gold) 8% 18%, transparent 19%),
+        conic-gradient(from 0deg, var(--gold), var(--cyan), var(--violet), var(--pink), var(--gold));
+      box-shadow: 0 0 24px rgba(92,245,255,.32), inset 0 0 18px rgba(0,0,0,.34);
+    }
+
+    .sun-logo::before,
+    .sun-logo::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(5, 14, 30, .92);
+      border-radius: 50%;
+    }
+
+    .sun-logo::after {
+      inset: -7px;
+      border-color: rgba(255, 225, 120, .25);
+      animation: spin 16s linear infinite;
+    }
+
+    .brand-title strong,
+    .brand-title span {
+      display: block;
+    }
+
+    .brand-title strong {
+      font-size: 25px;
+      letter-spacing: .16em;
+      line-height: 1;
+    }
+
+    .brand-title span {
+      margin-top: 5px;
+      color: var(--cyan);
+      font-size: 11px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .top-center {
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+      padding: 9px 18px;
+    }
+
+    .top-center h1 {
+      margin: 0;
+      font-size: clamp(18px, 2.2vw, 31px);
+      letter-spacing: .23em;
+      text-transform: uppercase;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .top-center p {
+      margin: 8px 0 0;
+      color: #8ecbff;
+      font-size: 11px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    .top-actions {
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    button, .mini-btn {
+      appearance: none;
+      border: 1px solid rgba(91, 206, 255, .26);
+      background:
+        radial-gradient(circle at 50% 0, rgba(92,245,255,.18), transparent 58%),
+        linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.025));
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 13px;
+      cursor: pointer;
+      font-weight: 750;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      transition: .18s ease;
+    }
+
+    button:hover, .mini-btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(92,245,255,.66);
+    }
+
+    button.active {
+      border-color: rgba(255, 225, 120, .65);
+      color: #fff0c8;
+      box-shadow: inset 0 0 24px rgba(255,225,120,.12), 0 0 22px rgba(255,225,120,.08);
+    }
+
+    .clock {
+      min-width: 112px;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(91, 206, 255, .16);
+      background: rgba(0,0,0,.24);
+      color: var(--cyan);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      text-align: right;
+      line-height: 1.25;
+    }
+
+    .side {
+      position: absolute;
+      top: 86px;
+      bottom: 66px;
+      z-index: 25;
+      width: 356px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: .25s ease;
+    }
+
+    .side.left { left: 12px; }
+    .side.right { right: 12px; }
+    .side.hidden.left { transform: translateX(-112%); opacity: 0; }
+    .side.hidden.right { transform: translateX(112%); opacity: 0; }
+
+    .panel {
+      padding: 14px;
+      border-radius: 17px;
+      border: 1px solid rgba(91,206,255,.17);
+      background: rgba(4, 10, 23, .60);
+      min-height: 0;
+    }
+
+    .panel.compact { flex: 0 0 auto; }
+    .panel.flex { flex: 1; overflow: hidden; }
+
+    .panel-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 11px;
+      color: #e9f8ff;
+      font-size: 13px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .panel-title small {
+      color: var(--muted);
+      font-size: 10px;
+      letter-spacing: .08em;
+    }
+
+    .chart {
+      height: 78px;
+      width: 100%;
+      border-radius: 12px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(91,206,255,.10);
+      overflow: hidden;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 54px;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .bar {
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--green), var(--gold));
+      transform-origin: left;
+    }
+
+    .gauge-wrap {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .gauge {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, rgba(5,10,24,.95) 0 57%, transparent 58%),
+        conic-gradient(var(--green), var(--cyan), var(--violet), var(--pink), var(--gold), var(--green));
+      box-shadow: 0 0 28px rgba(92,245,255,.14);
+      animation: spin 14s linear infinite;
+    }
+
+    .gauge span {
+      display: grid;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: rgba(3,7,16,.94);
+      color: #dffaff;
+      font-weight: 850;
+      font-size: 20px;
+      animation: counterSpin 14s linear infinite;
+    }
+
+    .dual-icons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .vortex-preview, .rose-preview {
+      aspect-ratio: 1;
+      border-radius: 18px;
+      border: 1px solid rgba(91,206,255,.12);
+      background: rgba(0,0,0,.20);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vortex-preview::before {
+      content: "";
+      width: 78%;
+      height: 78%;
+      border-radius: 50%;
+      background: repeating-conic-gradient(from 0deg, var(--cyan) 0 4deg, var(--violet) 5deg 9deg, var(--pink) 10deg 14deg, var(--gold) 15deg 19deg);
+      mask-image: radial-gradient(circle, transparent 0 16%, black 17% 54%, transparent 55%);
+      animation: spin 5s linear infinite;
+      opacity: .92;
+    }
+
+    .rose-preview::before {
+      content: "✺";
+      color: var(--cyan);
+      font-size: 70px;
+      text-shadow: 0 0 22px rgba(92,245,255,.6);
+      animation: spin 10s linear infinite;
+    }
+
+    .scale-line {
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan), var(--green), var(--gold), var(--pink), var(--violet));
+      position: relative;
+      margin: 16px 4px 8px;
+    }
+
+    .scale-line::after {
+      content: "";
+      position: absolute;
+      left: var(--pos, 50%);
+      top: 50%;
+      width: 15px;
+      height: 15px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 18px var(--gold);
+    }
+
+    .binary-grid {
+      display: grid;
+      grid-template-columns: repeat(16, 1fr);
+      gap: 4px;
+      padding: 10px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.23);
+      border: 1px solid rgba(91,206,255,.10);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--green);
+      font-size: 11px;
+      text-align: center;
+      min-height: 90px;
+    }
+
+    .binary-grid span.one { color: var(--gold); text-shadow: 0 0 8px rgba(255,225,120,.7); }
+    .binary-grid span.zero { color: var(--cyan); opacity: .76; }
+    .binary-grid span.err { color: var(--pink); }
+
+    .network-mini {
+      height: 144px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.23);
+      border: 1px solid rgba(91,206,255,.10);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .telemetry {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      height: 44px;
+      z-index: 30;
+      display: grid;
+      grid-template-columns: 430px 1fr 420px;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .telemetry > div {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 9px 14px;
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 14px var(--green);
+      flex: 0 0 auto;
+    }
+
+    .bottom-stats {
+      display: grid !important;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px !important;
+      padding: 6px !important;
+    }
+
+    .bottom-stats span {
+      display: block;
+      border: 1px solid rgba(91,206,255,.12);
+      border-radius: 12px;
+      padding: 6px 8px;
+      background: rgba(0,0,0,.20);
+      text-align: center;
+      color: #dffaff;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    .controls {
+      justify-content: flex-end;
+    }
+
+    .control-knob {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, var(--cyan) 0 10%, transparent 11%),
+        conic-gradient(var(--blue), var(--cyan), var(--violet), var(--blue));
+      box-shadow: 0 0 22px rgba(92,245,255,.35);
+      animation: spin 4s linear infinite;
+    }
+
+    .center-label {
+      position: absolute;
+      z-index: 10;
+      left: 50%;
+      bottom: 92px;
+      transform: translateX(-50%);
+      padding: 9px 14px;
+      border: 1px solid rgba(91,206,255,.18);
+      border-radius: 999px;
+      background: rgba(3,8,18,.55);
+      backdrop-filter: blur(12px);
+      color: #ccfaff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      letter-spacing: .08em;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .params {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .param {
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(91,206,255,.10);
+      background: rgba(0,0,0,.18);
+    }
+
+    .param label {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+
+    .param b { color: var(--gold); font-variant-numeric: tabular-nums; }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes counterSpin { to { transform: rotate(-360deg); } }
+
+    .immersive .topbar,
+    .immersive .side,
+    .immersive .telemetry,
+    .immersive .center-label {
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+    }
+
+    @media (max-width: 1280px) {
+      .topbar { grid-template-columns: 310px 1fr 330px; }
+      .side { width: 310px; }
+      .telemetry { grid-template-columns: 320px 1fr 320px; }
+      .brand-title strong { font-size: 20px; }
+      .top-center h1 { letter-spacing: .14em; }
+    }
+
+    @media (max-width: 980px) {
+      .side.right { display: none; }
+      .side.left { width: 300px; }
+      .topbar { grid-template-columns: 1fr; height: auto; }
+      .top-center { display: none; }
+      .top-actions { justify-content: flex-start; flex-wrap: wrap; height: auto; }
+      .telemetry { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <canvas id="brainCanvas"></canvas>
+
+    <header class="topbar">
+      <div class="brand glass">
+        <div class="sun-logo"></div>
+        <div class="brand-title">
+          <strong>HELIOS</strong>
+          <span>Photonic Intelligent</span>
+        </div>
+      </div>
+
+      <div class="top-center glass">
+        <h1>Cerveau Chromoluminique</h1>
+        <p>Intelligence vivante · photonique · quantique simulée</p>
+      </div>
+
+      <div class="top-actions glass">
+        <button id="runBtn" class="active">Système actif</button>
+        <button id="burstBtn">Burst photons</button>
+        <button id="fullscreenBtn">Plein écran</button>
+        <button id="immersiveBtn">Immersion</button>
+        <div class="clock" id="clock">UTC+0<br>00:00:00</div>
+      </div>
+    </header>
+
+    <aside class="side left glass" id="leftPanel">
+      <section class="panel compact">
+        <div class="panel-title">Mémoire photonique <small>évolution temporelle</small></div>
+        <canvas class="chart" id="memoryChart"></canvas>
+      </section>
+
+      <section class="panel compact">
+        <div class="panel-title">Cohérence globale <small>phase</small></div>
+        <div class="gauge-wrap">
+          <div class="gauge"><span id="coherenceGauge">97%</span></div>
+          <div>
+            <div class="metric-row"><span>Phase 0</span><div class="bar"><i id="phase0" style="width:96%"></i></div><b id="phase0v">.987</b></div>
+            <div class="metric-row"><span>Phase 1</span><div class="bar"><i id="phase1" style="width:94%"></i></div><b id="phase1v">.975</b></div>
+            <div class="metric-row"><span>Phase 2</span><div class="bar"><i id="phase2" style="width:92%"></i></div><b id="phase2v">.962</b></div>
+            <div class="metric-row"><span>Phase 3</span><div class="bar"><i id="phase3" style="width:95%"></i></div><b id="phase3v">.981</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel compact">
+        <div class="panel-title">Spectre photonique <small>densité d'énergie</small></div>
+        <canvas class="chart" id="spectrumChart"></canvas>
+      </section>
+
+      <section class="panel compact">
+        <div class="panel-title">Vortex & rosaces <small>activité structurelle</small></div>
+        <div class="dual-icons">
+          <div class="vortex-preview"></div>
+          <div class="rose-preview"></div>
+        </div>
+      </section>
+
+      <section class="panel compact">
+        <div class="panel-title">Échelle micro → macro <small>zoom spatial</small></div>
+        <div class="scale-line" id="scaleLine" style="--pos:52%"></div>
+        <div style="display:flex;justify-content:space-between;color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase">
+          <span>10⁻¹⁵ · micro</span><span>10¹⁵ · macro</span>
+        </div>
+      </section>
+    </aside>
+
+    <aside class="side right glass" id="rightPanel">
+      <section class="panel compact">
+        <div class="panel-title">Transmission photonique <small>flux & intégrité</small></div>
+        <div class="metric-row"><span>Débit photonique</span><div class="bar"><i id="debitBar" style="width:92%"></i></div><b id="debitVal">2.48</b></div>
+        <div class="metric-row"><span>Intégrité flux</span><div class="bar"><i id="integrityBar" style="width:99%"></i></div><b id="integrityVal">99%</b></div>
+        <div class="metric-row"><span>Paquets/sec</span><div class="bar"><i id="packetBar" style="width:88%"></i></div><b id="packetVal">1.25</b></div>
+        <div class="metric-row"><span>Latence</span><div class="bar"><i id="latencyBar" style="width:35%"></i></div><b id="latencyVal">0.35</b></div>
+      </section>
+
+      <section class="panel compact">
+        <div class="panel-title">Signaux binaires <small>activité info.</small></div>
+        <div class="binary-grid" id="binaryGrid"></div>
+      </section>
+
+      <section class="panel compact">
+        <div class="panel-title">Cohérence de phase <small>stabilité ondes</small></div>
+        <canvas class="chart" id="phaseChart"></canvas>
+      </section>
+
+      <section class="panel flex">
+        <div class="panel-title">Topologie des liens <small>réseau photonique</small></div>
+        <canvas class="network-mini" id="networkChart"></canvas>
+      </section>
+    </aside>
+
+    <div class="center-label" id="centerLabel">CERVEAU CHROMOLUMINIQUE · MICRO → MACRO · INTELLIGENCE ÉMERGENTE</div>
+
+    <footer class="telemetry">
+      <div class="glass">
+        <span class="status-dot"></span>
+        <span>Helios Photonic Intelligent v10.2</span>
+        <span>Plateforme d'intelligence photonique avancée</span>
+      </div>
+      <div class="glass bottom-stats">
+        <span>Énergie<br><b id="energyStat">1.78 ZJ</b></span>
+        <span>Photons<br><b id="photonsStat">3.61e21</b></span>
+        <span>Densité<br><b id="densityStat">9.74</b></span>
+        <span>Entropie<br><b id="entropyStat">0.021</b></span>
+        <span>Harmonie<br><b id="harmonyStat">98.7%</b></span>
+        <span>IA<br><b>Émergente</b></span>
+      </div>
+      <div class="glass controls">
+        <button class="mini-btn" id="scanBtn">Scan 360°</button>
+        <button class="mini-btn" id="syncBtn">Synchro</button>
+        <button class="mini-btn" id="exportBtn">Exporter</button>
+        <div class="control-knob"></div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('brainCanvas');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const $ = (id) => document.getElementById(id);
+
+      const ui = {
+        app: $('app'), runBtn: $('runBtn'), burstBtn: $('burstBtn'), fullscreenBtn: $('fullscreenBtn'), immersiveBtn: $('immersiveBtn'),
+        scanBtn: $('scanBtn'), syncBtn: $('syncBtn'), exportBtn: $('exportBtn'), clock: $('clock'), centerLabel: $('centerLabel'),
+        memoryChart: $('memoryChart'), spectrumChart: $('spectrumChart'), phaseChart: $('phaseChart'), networkChart: $('networkChart'), binaryGrid: $('binaryGrid'), scaleLine: $('scaleLine'),
+        coherenceGauge: $('coherenceGauge'), debitVal: $('debitVal'), integrityVal: $('integrityVal'), packetVal: $('packetVal'), latencyVal: $('latencyVal'),
+        energyStat: $('energyStat'), photonsStat: $('photonsStat'), densityStat: $('densityStat'), entropyStat: $('entropyStat'), harmonyStat: $('harmonyStat')
+      };
+
+      const state = {
+        w: 0, h: 0, cx: 0, cy: 0, r: 0,
+        running: true, immersive: false,
+        t: 0, last: performance.now(),
+        stars: [], nodes: [], photons: [], memory: new Array(360).fill(0),
+        microScale: 0.52, coherence: 0.973, energy: 1.78, entropy: 0.021,
+        burstPower: 1, thoughtPulse: 0
+      };
+
+      const brainWords = [
+        'analyse', 'lumière', 'mémoire', 'phase', 'vortex', 'rosace', 'harmonie', 'transmission',
+        'micro', 'macro', 'conscience', 'structure', 'émergence', 'cohérence', 'réseau', 'photon'
+      ];
+
+      function resize() {
+        state.w = window.innerWidth;
+        state.h = window.innerHeight;
+        canvas.width = Math.floor(state.w * dpr);
+        canvas.height = Math.floor(state.h * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        state.cx = state.w * 0.5;
+        state.cy = state.h * 0.54;
+        state.r = Math.min(state.w, state.h) * 0.37;
+        initStars();
+        initNodes();
+        resizeSmallCharts();
+      }
+
+      function resizeSmallCharts() {
+        for (const c of [ui.memoryChart, ui.spectrumChart, ui.phaseChart, ui.networkChart]) {
+          const rect = c.getBoundingClientRect();
+          c.width = Math.max(1, Math.floor(rect.width * dpr));
+          c.height = Math.max(1, Math.floor(rect.height * dpr));
+          const cctx = c.getContext('2d');
+          cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+      }
+
+      function initStars() {
+        state.stars = Array.from({ length: 520 }, () => ({
+          x: Math.random() * state.w,
+          y: Math.random() * state.h,
+          r: Math.random() * 1.45 + 0.15,
+          a: Math.random() * 0.75 + 0.05,
+          tw: Math.random() * 5 + 1,
+          hue: 190 + Math.random() * 120
+        }));
+      }
+
+      function initNodes() {
+        state.nodes = [];
+        const rings = [0.12, 0.20, 0.29, 0.39, 0.50, 0.62, 0.75, 0.88];
+        rings.forEach((rr, layer) => {
+          const count = 8 + layer * 8;
+          for (let i = 0; i < count; i++) {
+            const mirrored = i % 2 === 0 ? 1 : -1;
+            state.nodes.push({
+              ring: rr,
+              layer,
+              a: (i / count) * Math.PI * 2 + (layer % 2 ? Math.PI / count : 0),
+              phase: Math.random() * Math.PI * 2,
+              power: Math.random() * 0.55 + 0.45,
+              mirror: mirrored
+            });
+          }
+        });
+      }
+
+      function angleForDegree(deg) { return -Math.PI / 2 + deg * Math.PI / 180; }
+      function hueForDegree(deg) { return (deg + 190) % 360; }
+      function point(cx, cy, a, r) { return { x: cx + Math.cos(a) * r, y: cy + Math.sin(a) * r }; }
+
+      function spawnPhotons(count = 120) {
+        for (let i = 0; i < count; i++) {
+          const degree = (Math.random() * 360) | 0;
+          state.photons.push({
+            degree,
+            bit: Math.random() > 0.5 ? 1 : 0,
+            life: 0,
+            ttl: 4 + Math.random() * 9,
+            radius: Math.random() * 0.16,
+            speed: 0.25 + Math.random() * 1.25,
+            phase: Math.random() * Math.PI * 2,
+            side: Math.random() > 0.5 ? 1 : -1,
+            amp: 0.6 + Math.random() * 0.8,
+            trail: []
+          });
+        }
+        if (state.photons.length > 1200) state.photons.splice(0, state.photons.length - 1200);
+      }
+
+      function drawBackground(t) {
+        ctx.clearRect(0, 0, state.w, state.h);
+        const g = ctx.createRadialGradient(state.cx, state.cy, 10, state.cx, state.cy, Math.max(state.w, state.h) * 0.75);
+        g.addColorStop(0, 'rgba(255,255,255,.09)');
+        g.addColorStop(0.20, 'rgba(92,245,255,.06)');
+        g.addColorStop(0.56, 'rgba(70,90,255,.07)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, state.w, state.h);
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        for (const s of state.stars) {
+          const a = s.a * (0.42 + 0.58 * Math.sin(t * s.tw + s.x * 0.01) ** 2);
+          ctx.beginPath();
+          ctx.fillStyle = `hsla(${s.hue}, 100%, 75%, ${a})`;
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      function drawDegreeWheel(t) {
+        const R = state.r;
+        ctx.save();
+        ctx.translate(state.cx, state.cy);
+        ctx.globalCompositeOperation = 'lighter';
+
+        const outerR = R * 1.13;
+        const innerR = R * 0.91;
+
+        for (let ring = 0; ring < 6; ring++) {
+          const rr = innerR + ring * R * 0.045;
+          ctx.beginPath();
+          ctx.arc(0, 0, rr, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(92,206,255,${0.12 + ring * 0.025})`;
+          ctx.lineWidth = ring === 5 ? 1.6 : 0.8;
+          ctx.stroke();
+        }
+
+        for (let d = 0; d < 360; d++) {
+          const a = angleForDegree(d);
+          const major = d % 10 === 0;
+          const medium = d % 5 === 0;
+          const from = major ? R * 1.05 : medium ? R * 1.075 : R * 1.095;
+          const to = R * 1.13;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(a) * from, Math.sin(a) * from);
+          ctx.lineTo(Math.cos(a) * to, Math.sin(a) * to);
+          ctx.strokeStyle = major ? `hsla(${hueForDegree(d)},100%,70%,.75)` : 'rgba(180,230,255,.22)';
+          ctx.lineWidth = major ? 1.3 : 0.45;
+          ctx.stroke();
+
+          if (major) {
+            ctx.save();
+            ctx.rotate(a);
+            ctx.translate(R * 1.18, 0);
+            ctx.rotate(Math.PI / 2);
+            ctx.fillStyle = `hsla(${hueForDegree(d)},100%,72%,.92)`;
+            ctx.font = `800 ${Math.max(12, R * 0.035)}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(String(d), 0, 0);
+            ctx.restore();
+          }
+        }
+
+        for (let i = 0; i < 7; i++) {
+          const rr = R * (0.68 + i * 0.065);
+          const start = t * (0.06 + i * 0.015) + i * 0.3;
+          ctx.beginPath();
+          ctx.arc(0, 0, rr, start, start + Math.PI * (1.05 + Math.sin(t + i) * 0.22));
+          ctx.strokeStyle = `hsla(${190 + i * 28 + t * 20},100%,65%,${0.11 + i * 0.02})`;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawRose(cx, cy, radius, lobes, rotation, alpha, hueBase) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rotation);
+        ctx.globalCompositeOperation = 'lighter';
+        for (let l = 0; l < lobes; l++) {
+          const shift = l / lobes * Math.PI * 2;
+          ctx.save();
+          ctx.rotate(shift);
+          ctx.beginPath();
+          for (let i = 0; i <= 120; i++) {
+            const p = i / 120;
+            const a = p * Math.PI * 2;
+            const rr = radius * (0.18 + 0.82 * Math.sin(a * 2) ** 2) * (0.62 + p * 0.38);
+            const x = Math.cos(a) * rr + Math.cos(shift) * radius * 0.15;
+            const y = Math.sin(a) * rr * 0.42;
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `hsla(${(hueBase + l * 19) % 360},100%,70%,${alpha})`;
+          ctx.lineWidth = Math.max(0.45, radius * 0.006);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function drawBrainRosaces(t) {
+        const R = state.r;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+
+        const lobes = [
+          { x: -0.23, y: -0.11, r: 0.24, h: 210 },
+          { x: 0.23, y: -0.11, r: 0.24, h: 45 },
+          { x: -0.25, y: 0.13, r: 0.22, h: 285 },
+          { x: 0.25, y: 0.13, r: 0.22, h: 150 },
+          { x: 0.00, y: -0.27, r: 0.20, h: 330 },
+          { x: 0.00, y: 0.25, r: 0.20, h: 185 },
+          { x: 0.00, y: 0.00, r: 0.30, h: 65 }
+        ];
+
+        for (const lobe of lobes) {
+          const breathing = 1 + 0.035 * Math.sin(t * 1.4 + lobe.h);
+          drawRose(
+            state.cx + lobe.x * R,
+            state.cy + lobe.y * R,
+            lobe.r * R * breathing,
+            12,
+            t * 0.08 + lobe.h,
+            0.105 + 0.05 * Math.sin(t + lobe.h) ** 2,
+            lobe.h + t * 8
+          );
+        }
+
+        for (let k = 0; k < 5; k++) {
+          drawRose(state.cx, state.cy, R * (0.09 + k * 0.055), 8 + k * 2, -t * (0.16 + k * 0.02), 0.10, 175 + k * 42 + t * 12);
+        }
+
+        ctx.restore();
+      }
+
+      function drawVortex(t) {
+        const R = state.r;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.lineCap = 'round';
+
+        for (let arm = 0; arm < 42; arm++) {
+          ctx.beginPath();
+          const h = (arm * 8 + t * 38) % 360;
+          for (let i = 0; i <= 260; i++) {
+            const n = i / 260;
+            const spiral = n * n * R * 0.66;
+            const a = n * Math.PI * (7.2 + Math.sin(t * .2) * 0.6) + arm * Math.PI * 2 / 42 + t * 0.42;
+            const x = state.cx + Math.cos(a) * spiral;
+            const y = state.cy + Math.sin(a) * spiral;
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = `hsla(${h},100%,65%,${0.045 + arm % 3 * 0.012})`;
+          ctx.lineWidth = 0.9;
+          ctx.stroke();
+        }
+
+        const core = ctx.createRadialGradient(state.cx, state.cy, 0, state.cx, state.cy, R * 0.16);
+        core.addColorStop(0, 'rgba(255,255,255,.94)');
+        core.addColorStop(.12, 'rgba(255,225,120,.72)');
+        core.addColorStop(.34, 'rgba(92,245,255,.34)');
+        core.addColorStop(1, 'rgba(92,245,255,0)');
+        ctx.beginPath();
+        ctx.fillStyle = core;
+        ctx.arc(state.cx, state.cy, R * 0.16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawNetwork(t) {
+        const R = state.r;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+
+        const coords = state.nodes.map((n) => {
+          const wave = 1 + 0.025 * Math.sin(t * 1.5 + n.phase);
+          const brainShape = 1 - 0.18 * Math.cos(n.a * 2);
+          const rr = R * n.ring * brainShape * wave;
+          return {
+            x: state.cx + Math.cos(n.a) * rr,
+            y: state.cy + Math.sin(n.a) * rr * 0.78,
+            h: 185 + n.layer * 24 + Math.sin(t + n.phase) * 40,
+            p: n.power,
+            layer: n.layer
+          };
+        });
+
+        for (let i = 0; i < coords.length; i++) {
+          const a = coords[i];
+          if (i % 2 === 0) {
+            for (let j = i + 3; j < coords.length; j += 17) {
+              const b = coords[j % coords.length];
+              const dx = a.x - b.x;
+              const dy = a.y - b.y;
+              const dist = Math.hypot(dx, dy);
+              if (dist < R * 0.55) {
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.quadraticCurveTo(state.cx, state.cy, b.x, b.y);
+                ctx.strokeStyle = `rgba(120,230,255,${0.018 + (1 - dist / (R * 0.55)) * 0.05})`;
+                ctx.lineWidth = 0.75;
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        for (const p of coords) {
+          const glow = 0.45 + 0.55 * Math.sin(t * 2.2 + p.x * 0.008) ** 2;
+          const size = R * (0.0045 + p.layer * 0.0007) * (1 + glow * 1.1);
+          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 7);
+          g.addColorStop(0, `hsla(${p.h},100%,82%,${0.78})`);
+          g.addColorStop(0.38, `hsla(${p.h},100%,60%,${0.22})`);
+          g.addColorStop(1, `hsla(${p.h},100%,50%,0)`);
+          ctx.beginPath();
+          ctx.fillStyle = g;
+          ctx.arc(p.x, p.y, size * 7, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.fillStyle = `hsla(${p.h},100%,84%,.92)`;
+          ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      function drawPhotons(dt, t) {
+        const R = state.r;
+        ctx.save();
+        ctx.globalCompositeOperation = 'lighter';
+
+        for (let i = state.photons.length - 1; i >= 0; i--) {
+          const p = state.photons[i];
+          p.life += dt * p.speed * (state.running ? 1 : 0);
+          p.degree = (p.degree + dt * 18 * p.speed * p.side + 360) % 360;
+          p.radius = Math.min(1, p.radius + dt * 0.055 * p.speed);
+
+          if (p.life > p.ttl) {
+            state.photons.splice(i, 1);
+            continue;
+          }
+
+          const wave = Math.sin(t * 8 + p.phase + p.degree * 0.03);
+          const a = angleForDegree(p.degree + wave * 6);
+          const rr = R * (0.08 + p.radius * 0.78) * (1 + 0.03 * wave);
+          const x = state.cx + Math.cos(a) * rr;
+          const y = state.cy + Math.sin(a) * rr * 0.88;
+          const hue = p.bit ? 48 + wave * 20 : 190 + wave * 40;
+          const size = R * (p.bit ? 0.0075 : 0.0055) * p.amp;
+
+          p.trail.push({ x, y, hue });
+          if (p.trail.length > 11) p.trail.shift();
+
+          const di = Math.round(p.degree) % 360;
+          state.memory[di] = Math.min(1, state.memory[di] + 0.009 + p.bit * 0.012);
+
+          for (let j = 0; j < p.trail.length; j++) {
+            const tr = p.trail[j];
+            const alpha = (j + 1) / p.trail.length;
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(${tr.hue},100%,70%,${0.02 + alpha * 0.055})`;
+            ctx.arc(tr.x, tr.y, size * (0.6 + alpha * 1.3), 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          const g = ctx.createRadialGradient(x, y, 0, x, y, size * 8);
+          g.addColorStop(0, `hsla(${hue},100%,82%,.84)`);
+          g.addColorStop(.32, `hsla(${hue},100%,62%,.28)`);
+          g.addColorStop(1, `hsla(${hue},100%,50%,0)`);
+          ctx.beginPath();
+          ctx.fillStyle = g;
+          ctx.arc(x, y, size * 8, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.fillStyle = `hsla(${hue},100%,88%,.95)`;
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        for (let d = 0; d < 360; d++) {
+          const v = state.memory[d];
+          if (v < 0.01) continue;
+          state.memory[d] *= 0.996;
+          const a = angleForDegree(d);
+          const r1 = R * 0.93;
+          const r2 = R * (0.95 + v * 0.13);
+          ctx.beginPath();
+          ctx.moveTo(state.cx + Math.cos(a) * r1, state.cy + Math.sin(a) * r1);
+          ctx.lineTo(state.cx + Math.cos(a) * r2, state.cy + Math.sin(a) * r2);
+          ctx.strokeStyle = `hsla(${hueForDegree(d)},100%,68%,${v * 0.44})`;
+          ctx.lineWidth = 0.8 + v * 2.2;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      function drawScaleLabels(t) {
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'rgba(190,245,255,.85)';
+        ctx.font = '700 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+        ctx.fillText('ÉCHELLE ANGULAIRE 360°', state.cx, state.cy - state.r * 0.78);
+        ctx.fillText('RÉSOLUTION : 0.01° · MICRO → MACRO', state.cx, state.cy - state.r * 0.72);
+        ctx.fillStyle = 'rgba(195,250,255,.92)';
+        ctx.font = '800 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+        ctx.fillText('CERVEAU CHROMOLUMINIQUE', state.cx, state.cy + state.r * 0.62);
+        ctx.fillStyle = 'rgba(255,225,120,.72)';
+        ctx.fillText('INTELLIGENCE VIVANTE', state.cx, state.cy + state.r * 0.67);
+        ctx.restore();
+      }
+
+      function drawMemoryChart(t) {
+        const c = ui.memoryChart;
+        const cctx = c.getContext('2d');
+        const w = c.clientWidth, h = c.clientHeight;
+        cctx.clearRect(0, 0, w, h);
+        cctx.save();
+        cctx.globalCompositeOperation = 'lighter';
+        for (let i = 0; i < w; i += 2) {
+          const n = i / w;
+          const y = h * 0.58 + Math.sin(n * 36 + t * 3) * h * 0.13 + Math.sin(n * 90 + t * 1.4) * h * 0.05;
+          const barH = Math.abs(Math.sin(n * 12 + t) * h * 0.5);
+          cctx.beginPath();
+          cctx.strokeStyle = `hsla(${n * 360},100%,62%,.52)`;
+          cctx.moveTo(i, y - barH * 0.5);
+          cctx.lineTo(i, y + barH * 0.5);
+          cctx.stroke();
+        }
+        cctx.restore();
+      }
+
+      function drawSpectrumChart(t) {
+        const c = ui.spectrumChart;
+        const cctx = c.getContext('2d');
+        const w = c.clientWidth, h = c.clientHeight;
+        cctx.clearRect(0, 0, w, h);
+        cctx.save();
+        cctx.globalCompositeOperation = 'lighter';
+        cctx.beginPath();
+        for (let i = 0; i <= w; i++) {
+          const n = i / w;
+          const y = h * (0.70 - 0.32 * Math.abs(Math.sin(n * 18 + t * 0.7)) - 0.10 * Math.sin(n * 55 + t * 2));
+          if (i === 0) cctx.moveTo(i, y); else cctx.lineTo(i, y);
+        }
+        cctx.lineTo(w, h); cctx.lineTo(0, h); cctx.closePath();
+        const grad = cctx.createLinearGradient(0, 0, w, 0);
+        grad.addColorStop(0, 'rgba(60,40,255,.55)');
+        grad.addColorStop(.22, 'rgba(0,220,255,.55)');
+        grad.addColorStop(.45, 'rgba(100,255,160,.55)');
+        grad.addColorStop(.62, 'rgba(255,230,90,.55)');
+        grad.addColorStop(.78, 'rgba(255,100,160,.55)');
+        grad.addColorStop(1, 'rgba(180,70,255,.55)');
+        cctx.fillStyle = grad;
+        cctx.fill();
+        cctx.restore();
+      }
+
+      function drawPhaseChart(t) {
+        const c = ui.phaseChart;
+        const cctx = c.getContext('2d');
+        const w = c.clientWidth, h = c.clientHeight;
+        cctx.clearRect(0, 0, w, h);
+        cctx.save();
+        cctx.globalCompositeOperation = 'lighter';
+        for (let k = 0; k < 6; k++) {
+          cctx.beginPath();
+          for (let i = 0; i <= w; i++) {
+            const n = i / w;
+            const y = h * 0.5 + Math.sin(n * Math.PI * (4 + k * 0.6) + t * (1.3 + k * 0.25)) * h * (0.15 - k * 0.01);
+            if (i === 0) cctx.moveTo(i, y); else cctx.lineTo(i, y);
+          }
+          cctx.strokeStyle = `hsla(${k * 55 + 170},100%,65%,.62)`;
+          cctx.lineWidth = 1.1;
+          cctx.stroke();
+        }
+        cctx.restore();
+      }
+
+      function drawNetworkMini(t) {
+        const c = ui.networkChart;
+        const cctx = c.getContext('2d');
+        const w = c.clientWidth, h = c.clientHeight;
+        cctx.clearRect(0, 0, w, h);
+        const pts = [];
+        for (let i = 0; i < 38; i++) {
+          const x = w * (0.08 + 0.84 * ((Math.sin(i * 12.989) * 43758.5453) % 1 + 1) % 1);
+          const y = h * (0.12 + 0.76 * ((Math.sin(i * 78.233) * 12345.678) % 1 + 1) % 1);
+          pts.push({ x, y, h: 180 + i * 11 });
+        }
+        cctx.save();
+        cctx.globalCompositeOperation = 'lighter';
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            const d = Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y);
+            if (d < 76) {
+              cctx.beginPath();
+              cctx.moveTo(pts[i].x, pts[i].y);
+              cctx.lineTo(pts[j].x, pts[j].y);
+              cctx.strokeStyle = `rgba(92,245,255,${0.09 * (1 - d / 76)})`;
+              cctx.stroke();
+            }
+          }
+        }
+        for (const p of pts) {
+          cctx.beginPath();
+          cctx.fillStyle = `hsla(${p.h + t * 20},100%,72%,.82)`;
+          cctx.arc(p.x, p.y, 2.1 + Math.sin(t + p.x) * .6, 0, Math.PI * 2);
+          cctx.fill();
+        }
+        cctx.restore();
+      }
+
+      function updateBinaryGrid(t) {
+        if (updateBinaryGrid.mark === Math.floor(t * 8)) return;
+        updateBinaryGrid.mark = Math.floor(t * 8);
+        ui.binaryGrid.innerHTML = '';
+        for (let i = 0; i < 96; i++) {
+          const v = Math.random() > 0.52 ? 1 : 0;
+          const s = document.createElement('span');
+          s.textContent = String(v);
+          s.className = Math.random() < 0.035 ? 'err' : v ? 'one' : 'zero';
+          ui.binaryGrid.appendChild(s);
+        }
+      }
+
+      function updateUI(t) {
+        const now = new Date();
+        ui.clock.innerHTML = `UTC+0<br>${now.toISOString().substring(11, 19)}`;
+
+        state.coherence = 0.965 + Math.sin(t * 0.75) * 0.015 + Math.min(0.012, state.photons.length / 90000);
+        state.energy = 1.78 + Math.sin(t * .22) * .11 + state.photons.length * 0.00025;
+        state.entropy = 0.021 + Math.abs(Math.sin(t * .35)) * 0.009;
+        state.microScale = 0.5 + 0.34 * Math.sin(t * 0.13);
+
+        ui.coherenceGauge.textContent = `${Math.round(state.coherence * 100)}%`;
+        ui.debitVal.textContent = `${(2.2 + Math.sin(t*.9)*.35).toFixed(2)}`;
+        ui.integrityVal.textContent = `${(98.9 + Math.sin(t*.5)*.8).toFixed(1)}%`;
+        ui.packetVal.textContent = `${(1.1 + state.photons.length/1800).toFixed(2)}`;
+        ui.latencyVal.textContent = `${(0.22 + Math.abs(Math.sin(t*.4))*.18).toFixed(2)}`;
+        ui.energyStat.textContent = `${state.energy.toFixed(2)} ZJ`;
+        ui.photonsStat.textContent = `${(3.2 + state.photons.length/500).toFixed(2)}e21`;
+        ui.densityStat.textContent = `${(9.2 + Math.sin(t*.7)*.6).toFixed(2)}`;
+        ui.entropyStat.textContent = state.entropy.toFixed(3);
+        ui.harmonyStat.textContent = `${(state.coherence*100).toFixed(1)}%`;
+        ui.scaleLine.style.setProperty('--pos', `${Math.round((state.microScale * .5 + .5) * 100)}%`);
+
+        for (let i = 0; i < 4; i++) {
+          const v = 0.94 + Math.sin(t * .8 + i) * 0.028;
+          const bar = document.getElementById(`phase${i}`);
+          const val = document.getElementById(`phase${i}v`);
+          if (bar) bar.style.width = `${Math.round(v * 100)}%`;
+          if (val) val.textContent = `.${Math.round(v * 1000)}`;
+        }
+      }
+
+      function render(now) {
+        const dt = Math.min(0.05, (now - state.last) / 1000);
+        state.last = now;
+        if (state.running) state.t += dt;
+        const t = state.t;
+
+        drawBackground(t);
+        drawDegreeWheel(t);
+        drawBrainRosaces(t);
+        drawNetwork(t);
+        drawVortex(t);
+        drawPhotons(dt, t);
+        drawScaleLabels(t);
+
+        drawMemoryChart(t);
+        drawSpectrumChart(t);
+        drawPhaseChart(t);
+        drawNetworkMini(t);
+        updateBinaryGrid(t);
+        updateUI(t);
+
+        if (state.running && state.photons.length < 440 && Math.random() < 0.08) spawnPhotons(8);
+        if (state.running && Math.random() < 0.012) spawnPhotons(42);
+
+        requestAnimationFrame(render);
+      }
+
+      function toggleRun() {
+        state.running = !state.running;
+        ui.runBtn.classList.toggle('active', state.running);
+        ui.runBtn.textContent = state.running ? 'Système actif' : 'Pause système';
+      }
+
+      async function fullscreen() {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+            ui.fullscreenBtn.textContent = 'Quitter écran';
+          } else {
+            await document.exitFullscreen();
+            ui.fullscreenBtn.textContent = 'Plein écran';
+          }
+        } catch (e) {
+          console.warn('Fullscreen refusé', e);
+        }
+      }
+
+      function exportPng() {
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = `helios-cerveau-chromoluminique-${Date.now()}.png`;
+        a.click();
+      }
+
+      ui.runBtn.addEventListener('click', toggleRun);
+      ui.burstBtn.addEventListener('click', () => spawnPhotons(260));
+      ui.scanBtn.addEventListener('click', () => spawnPhotons(160));
+      ui.syncBtn.addEventListener('click', () => { state.memory.fill(0.08); spawnPhotons(220); });
+      ui.exportBtn.addEventListener('click', exportPng);
+      ui.fullscreenBtn.addEventListener('click', fullscreen);
+      ui.immersiveBtn.addEventListener('click', () => {
+        state.immersive = !state.immersive;
+        ui.app.classList.toggle('immersive', state.immersive);
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') { e.preventDefault(); toggleRun(); }
+        if (e.key.toLowerCase() === 'f') fullscreen();
+        if (e.key.toLowerCase() === 'b') spawnPhotons(260);
+        if (e.key.toLowerCase() === 'h') ui.immersiveBtn.click();
+        if (e.key.toLowerCase() === 'e') exportPng();
+      });
+
+      window.addEventListener('resize', resize);
+      resize();
+      spawnPhotons(360);
+      requestAnimationFrame(render);
+    })();
+  </script>
+</body>
+</html>
