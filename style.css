@@ -1,620 +1,165 @@
 /* =========================================================
-   HELIOS PHOTONIX — STYLE.CSS COMPLET
-   Correction roue + suppression rendu brouillon
+   HELIOS WHEEL FIX — VISIBILITÉ PROFESSIONNELLE
    ========================================================= */
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: Inter, Arial, sans-serif;
-  background: #05070d;
-  color: #f7fbff;
-  overflow-x: hidden;
-}
-
-/* BACKGROUND */
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -3;
-  background:
-    radial-gradient(circle at 80% 35%, rgba(255, 158, 79, 0.18), transparent 28%),
-    radial-gradient(circle at 35% 45%, rgba(45, 185, 255, 0.20), transparent 34%),
-    linear-gradient(135deg, #02040a 0%, #071326 48%, #100717 100%);
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background-image:
-    linear-gradient(rgba(120, 220, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 220, 255, 0.045) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(circle at center, black 0%, transparent 72%);
-}
-
-/* HEADER */
-
-.site-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  min-height: 82px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 42px;
-  background: rgba(4, 7, 13, 0.82);
-  border-bottom: 1px solid rgba(110, 220, 255, 0.12);
-  backdrop-filter: blur(18px);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.logo,
-.brand img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-}
-
-.brand-title {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.brand-subtitle {
-  margin-top: 3px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: #62dfff;
-  text-transform: uppercase;
-}
-
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.nav a {
-  color: rgba(235, 246, 255, 0.82);
-  text-decoration: none;
-  font-weight: 800;
-  font-size: 14px;
-  transition: 0.25s ease;
-}
-
-.nav a:hover {
-  color: #6ff4ff;
-}
-
-.nav a.active,
-.nav .active {
-  color: #06101d;
-  background: linear-gradient(135deg, #40efff, #ffe1b8);
-  padding: 13px 20px;
-  border-radius: 999px;
-  box-shadow: 0 0 26px rgba(75, 230, 255, 0.32);
-}
-
-/* LAYOUT */
-
-.section,
-.hero,
-.page-section {
-  position: relative;
-  padding: 110px 6vw;
-}
-
-.container {
-  width: min(1180px, 100%);
-  margin: 0 auto;
-}
-
-.hero {
-  min-height: calc(100vh - 82px);
-  display: grid;
-  grid-template-columns: 1.02fr 0.98fr;
-  align-items: center;
-  gap: 54px;
-}
-
-.eyebrow {
-  color: #39e7ff;
-  font-size: 13px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  margin-bottom: 18px;
-}
-
-h1 {
-  font-size: clamp(48px, 7vw, 92px);
-  line-height: 0.95;
-  letter-spacing: -0.065em;
-  max-width: 860px;
-}
-
-h2 {
-  font-size: clamp(34px, 5vw, 68px);
-  line-height: 1;
-  letter-spacing: -0.055em;
-  margin-bottom: 22px;
-}
-
-h3 {
-  font-size: 24px;
-  line-height: 1.1;
-  margin-bottom: 14px;
-}
-
-p {
-  color: rgba(238, 247, 255, 0.76);
-  font-size: 17px;
-  line-height: 1.75;
-}
-
-.lead {
-  max-width: 760px;
-  font-size: 19px;
-  color: rgba(240, 248, 255, 0.86);
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 28px;
-}
-
-.tag {
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(130, 230, 255, 0.18);
-  background: rgba(255, 255, 255, 0.065);
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* BUTTONS */
-
-.btn-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 34px;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 50px;
-  padding: 0 22px;
-  border-radius: 999px;
-  text-decoration: none;
-  font-weight: 900;
-  border: 1px solid rgba(120, 230, 255, 0.22);
-  color: white;
-  background: rgba(255, 255, 255, 0.07);
-  transition: 0.25s ease;
-}
-
-.btn.primary {
-  color: #05101b;
-  background: linear-gradient(135deg, #4ff6ff, #ffe1b2);
-  box-shadow: 0 0 34px rgba(68, 230, 255, 0.32);
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-/* CARDS */
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  margin-top: 42px;
-}
-
-.card,
-.quantum-card,
-.data-card,
-.feature-card {
-  position: relative;
-  overflow: hidden;
-  min-height: 220px;
-  padding: 34px;
-  border-radius: 32px;
-  border: 1px solid rgba(120, 230, 255, 0.17);
-  background:
-    linear-gradient(145deg, rgba(12, 26, 58, 0.82), rgba(8, 12, 28, 0.74));
-  box-shadow:
-    0 18px 60px rgba(0, 0, 0, 0.36),
-    inset 0 0 46px rgba(90, 190, 255, 0.05);
-  backdrop-filter: blur(14px);
-}
-
-.card::before,
-.quantum-card::before,
-.data-card::before,
-.feature-card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  background: radial-gradient(circle at 20% 20%, rgba(99, 236, 255, 0.18), transparent 36%);
-  pointer-events: none;
-}
-
-.card > *,
-.quantum-card > *,
-.data-card > *,
-.feature-card > * {
-  position: relative;
-  z-index: 2;
-}
-
-.num {
-  width: 52px;
-  height: 52px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 22px;
-  border-radius: 50%;
-  color: #06131d;
-  background: linear-gradient(135deg, #61f5ff, #ffe5bd);
-  font-weight: 900;
-}
-
-/* HERO VISUAL / ROUE */
-
-.hero-visual,
-.hero-wheel,
-.visual-zone,
-.astro-panel {
-  position: relative;
-  min-height: 640px;
-  overflow: visible !important;
-  display: grid;
-  place-items: center;
-}
-
-.wheel-card,
-.orbit-card,
 .astro-wheel,
 .quantum-wheel,
 .wheel-visual,
+.orbit-card,
 .data-field-visual,
 .helios-wheel-wrapper {
-  position: relative;
-  width: min(620px, 88vw);
-  aspect-ratio: 1 / 1;
-  border-radius: 38px;
-  overflow: visible !important;
-  background:
-    linear-gradient(145deg, rgba(8, 18, 44, 0.88), rgba(12, 24, 60, 0.58)) !important;
-  border: 1px solid rgba(116, 228, 255, 0.19);
-  box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.48),
-    inset 0 0 60px rgba(90, 190, 255, 0.07);
-  backdrop-filter: blur(12px);
+    position: relative;
+    overflow: visible !important;
+    background: transparent !important;
+    z-index: 2;
 }
 
-/* Le voile blanc était le problème : ici il devient quasi invisible */
-.wheel-card::before,
-.orbit-card::before,
+/* Supprime le voile blanc / disque opaque */
 .astro-wheel::before,
 .quantum-wheel::before,
 .wheel-visual::before,
+.orbit-card::before,
 .data-field-visual::before,
 .helios-wheel-wrapper::before {
-  content: "";
-  position: absolute;
-  inset: 8%;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle,
-      rgba(120, 235, 255, 0.08) 0%,
-      rgba(130, 120, 255, 0.04) 38%,
-      rgba(0, 0, 0, 0) 72%);
-  opacity: 0.16 !important;
-  pointer-events: none;
-  z-index: 1;
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background:
+        radial-gradient(
+            circle,
+            rgba(110,220,255,0.06) 0%,
+            rgba(110,220,255,0.03) 35%,
+            rgba(0,0,0,0) 75%
+        );
+    opacity: 0.18 !important;
+    pointer-events: none;
+    z-index: 1;
 }
 
-/* SVG / CANVAS AU PREMIER PLAN */
-.wheel-card svg,
-.orbit-card svg,
+/* Remet la vraie roue au premier plan */
 .astro-wheel svg,
 .quantum-wheel svg,
 .wheel-visual svg,
+.orbit-card svg,
 .data-field-visual svg,
 .helios-wheel-wrapper svg,
 #heliosWheel,
 #wheelCanvas,
 canvas {
-  position: relative;
-  z-index: 10 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  width: 100%;
-  height: 100%;
-  display: block;
-  filter:
-    brightness(1.22)
-    contrast(1.42)
-    saturate(1.3)
-    drop-shadow(0 0 18px rgba(86, 220, 255, 0.18));
+    position: relative;
+    z-index: 10 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+
+    filter:
+        brightness(1.18)
+        contrast(1.35)
+        saturate(1.25);
+
+    transform: scale(1.02);
 }
 
-/* Cercles visibles */
+/* Cercles orbitaux visibles */
 .orbit,
 .orbit-ring,
 .wheel-ring,
 .data-ring,
 circle {
-  stroke: rgba(125, 238, 255, 0.52) !important;
-  stroke-width: 1.5px !important;
-  filter:
-    drop-shadow(0 0 8px rgba(80, 220, 255, 0.34))
-    drop-shadow(0 0 18px rgba(80, 220, 255, 0.16));
+    stroke: rgba(120,240,255,0.45) !important;
+    stroke-width: 1.6px !important;
+
+    filter:
+        drop-shadow(0 0 8px rgba(90,220,255,0.35))
+        drop-shadow(0 0 20px rgba(90,220,255,0.18));
 }
 
-/* Texte de roue au-dessus */
-.wheel-label,
-.astro-label,
-.data-label,
-.orbit-label,
-text {
-  fill: rgba(255, 255, 255, 0.92) !important;
-  color: rgba(255, 255, 255, 0.92) !important;
-  font-weight: 800;
-  text-shadow: 0 0 10px rgba(120, 230, 255, 0.45);
-}
-
-/* Photons */
+/* Photons plus visibles */
 .photon,
 .photon-dot,
 .light-particle,
 .quantum-particle {
-  opacity: 1 !important;
-  box-shadow:
-    0 0 10px currentColor,
-    0 0 22px currentColor,
-    0 0 44px currentColor;
-  filter:
-    drop-shadow(0 0 10px currentColor)
-    drop-shadow(0 0 22px currentColor);
+    opacity: 1 !important;
+
+    box-shadow:
+        0 0 8px currentColor,
+        0 0 18px currentColor,
+        0 0 34px currentColor;
 }
 
-/* Noyau central */
+/* Halo central professionnel */
 .central-core,
 .quantum-core,
-.helios-core,
-.core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 78px;
-  height: 78px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle,
-      rgba(255, 255, 255, 1) 0%,
-      rgba(150, 248, 255, 0.96) 24%,
-      rgba(67, 188, 255, 0.44) 56%,
-      rgba(0, 0, 0, 0) 100%);
-  box-shadow:
-    0 0 32px rgba(125, 240, 255, 0.58),
-    0 0 82px rgba(90, 170, 255, 0.32),
-    0 0 150px rgba(140, 100, 255, 0.20);
-  z-index: 12;
+.helios-core {
+    position: relative;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,0.98) 0%,
+            rgba(130,240,255,0.95) 20%,
+            rgba(90,160,255,0.42) 55%,
+            rgba(0,0,0,0) 100%
+        );
+
+    box-shadow:
+        0 0 30px rgba(130,240,255,0.45),
+        0 0 80px rgba(90,160,255,0.25),
+        0 0 140px rgba(120,90,255,0.18);
 }
 
-/* Bandeau texte dans la roue */
-.wheel-caption,
-.data-field-caption,
-.orbit-caption {
-  position: absolute;
-  left: 36px;
-  right: 36px;
-  bottom: 34px;
-  z-index: 20;
-  padding: 24px;
-  border-radius: 22px;
-  background: rgba(5, 16, 34, 0.78);
-  border: 1px solid rgba(120, 220, 255, 0.16);
-  backdrop-filter: blur(12px);
+/* Carte plus premium */
+.orbit-card,
+.data-field-card,
+.quantum-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8,15,35,0.86),
+            rgba(12,20,48,0.72)
+        ) !important;
+
+    border: 1px solid rgba(110,220,255,0.18);
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.45),
+        inset 0 0 40px rgba(90,180,255,0.05);
+
+    backdrop-filter: blur(10px);
 }
 
-.wheel-caption h3,
-.data-field-caption h3,
-.orbit-caption h3 {
-  font-size: 18px;
-  margin-bottom: 8px;
+/* Texte lisible */
+.orbit-card h3,
+.orbit-card p,
+.data-field-card h3,
+.data-field-card p {
+    position: relative;
+    z-index: 15;
+    color: rgba(255,255,255,0.92);
 }
 
-.wheel-caption p,
-.data-field-caption p,
-.orbit-caption p {
-  font-size: 14px;
-  line-height: 1.45;
+/* Évite que la roue soit coupée */
+.hero-visual,
+.hero-wheel,
+.visual-zone {
+    overflow: visible !important;
+    min-height: 620px;
 }
 
-/* ANIMATIONS */
+/* Responsive */
+@media (max-width: 900px) {
 
-@keyframes orbitRotate {
-  to {
-    transform: rotate(360deg);
-  }
-}
+    .astro-wheel svg,
+    .quantum-wheel svg,
+    #heliosWheel,
+    #wheelCanvas,
+    canvas {
+        transform: scale(0.92);
+    }
 
-.rotating {
-  animation: orbitRotate 36s linear infinite;
-  transform-origin: center;
-}
-
-.pulse {
-  animation: pulseLight 2.8s ease-in-out infinite;
-}
-
-@keyframes pulseLight {
-  0%, 100% {
-    opacity: 0.72;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-}
-
-/* SECTIONS */
-
-.section-title {
-  max-width: 900px;
-  margin-bottom: 32px;
-}
-
-.two-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 34px;
-  align-items: center;
-}
-
-.panel {
-  padding: 34px;
-  border-radius: 32px;
-  border: 1px solid rgba(120, 230, 255, 0.16);
-  background: rgba(255, 255, 255, 0.055);
-  backdrop-filter: blur(12px);
-}
-
-/* MASQUAGE SECTION GITHUB CLIENT */
-.github-section,
-#github,
-#deploy,
-#installation,
-.installation-github,
-.deploy-github,
-.github-deploy {
-  display: none !important;
-}
-
-/* FOOTER */
-
-.footer {
-  padding: 48px 6vw;
-  border-top: 1px solid rgba(110, 220, 255, 0.12);
-  background: rgba(2, 5, 11, 0.78);
-  color: rgba(240, 248, 255, 0.62);
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 1050px) {
-  .hero {
-    grid-template-columns: 1fr;
-    padding-top: 80px;
-  }
-
-  .hero-visual,
-  .hero-wheel,
-  .visual-zone,
-  .astro-panel {
-    min-height: 560px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .two-columns {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 760px) {
-  .site-header {
-    padding: 16px 22px;
-    align-items: flex-start;
-    gap: 18px;
-    flex-direction: column;
-  }
-
-  .nav {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-
-  .section,
-  .hero,
-  .page-section {
-    padding: 76px 22px;
-  }
-
-  h1 {
-    font-size: 46px;
-  }
-
-  h2 {
-    font-size: 36px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-visual,
-  .hero-wheel,
-  .visual-zone,
-  .astro-panel {
-    min-height: 430px;
-  }
-
-  .wheel-card,
-  .orbit-card,
-  .astro-wheel,
-  .quantum-wheel,
-  .wheel-visual,
-  .data-field-visual,
-  .helios-wheel-wrapper {
-    width: min(390px, 94vw);
-  }
-
-  .wheel-caption,
-  .data-field-caption,
-  .orbit-caption {
-    left: 18px;
-    right: 18px;
-    bottom: 18px;
-    padding: 18px;
-  }
+    .hero-visual,
+    .hero-wheel,
+    .visual-zone {
+        min-height: 460px;
+    }
 }
